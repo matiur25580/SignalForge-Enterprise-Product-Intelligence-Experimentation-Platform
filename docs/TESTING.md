@@ -10,7 +10,7 @@ pnpm db:generate
 pnpm test
 ```
 
-The root `pnpm test` command runs the web-app Vitest suite. Use `pnpm --filter @signalforge/web test:watch` while developing.
+The root `pnpm test` command runs the web-app Vitest suite, including PostgreSQL-backed integration tests. Configure `DATABASE_URL` to a migrated PostgreSQL database before running locally. Use `pnpm --filter @signalforge/web test:watch` for watch-mode unit tests while developing.
 
 ## Ingestion coverage
 
@@ -26,7 +26,9 @@ The current suite covers:
 - Strict event field validation and malformed JSON
 - Request body size limits
 - Generic persistence error responses that do not expose database details
+- Atomic quota enforcement under concurrent PostgreSQL transactions
+- Event-volume quota rejection without consuming additional capacity
 
 Prisma calls are mocked at the route boundary. These tests validate request/authentication orchestration and persistence intent, but they are not substitutes for end-to-end tests against a running application and a real database.
 
-GitHub Actions runs this suite after applying migrations to its ephemeral PostgreSQL 16 service, then continues with lint, typecheck, and production build.
+GitHub Actions runs this suite after applying migrations to its ephemeral PostgreSQL 16 service, including real database concurrency checks, then continues with lint, typecheck, and production build.
