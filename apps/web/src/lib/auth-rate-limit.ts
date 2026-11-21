@@ -20,11 +20,15 @@ export function hashClientAddress(address: string) {
   return hashRateLimitSubject(`ip:${address}`);
 }
 
-/** Shared fixed-window limiter; only a keyed digest of the client address is persisted. */
+/** Shared fixed-window limiter; only a keyed digest of the subject is persisted. */
 export async function consumeAuthRateLimit(subject: string, now = new Date()) {
   const key = hashRateLimitSubject(subject);
   const expiresAt = new Date(now.getTime() + AUTH_RATE_LIMIT.windowMs * 2);
   const rows = await prisma.$queryRaw<RateLimitRow[]>`
+    WITH cleanup AS (
+      DELETE FROM "AuthRateLimit"
+      WHERE "expiresAt" <= ${now} AND "key" <> ${key}
+    )
     INSERT INTO "AuthRateLimit" ("key", "windowStartedAt", "requestCount", "expiresAt")
     VALUES (${key}, ${now}, 1, ${expiresAt})
     ON CONFLICT ("key") DO UPDATE SET
