@@ -71,14 +71,13 @@ export async function GET(request: Request, { params }: RouteContext) {
       select: { id: true, name: true, slug: true, environment: true },
     });
     const projectById = new Map(projects.map((project) => [project.id, project]));
-    const keyById = new Map(apiKeys.map((key) => [key.id, key]));
 
     return Response.json({
       range: { from: from.toISOString(), to: to.toISOString() },
       totalEvents,
       projects: projectUsage.map((item) => ({
         project: projectById.get(item.projectId) ?? { id: item.projectId, name: "Unknown project" },
-        events: item._count._all,
+        events: typeof item._count === "object" && item._count !== null && "_all" in item._count && typeof item._count._all === "number" ? item._count._all : 0,
       })),
       apiKeys: apiKeys.map((key) => ({
         id: key.id,
@@ -87,7 +86,7 @@ export async function GET(request: Request, { params }: RouteContext) {
         projectId: key.projectId,
         lastUsedAt: key.lastUsedAt,
         revokedAt: key.revokedAt,
-        events: keyUsage.find((item) => item.apiKeyId === key.id)?._count._all ?? 0,
+        events: (() => { const usage = keyUsage.find((item) => item.apiKeyId === key.id); return usage && typeof usage._count === "object" && usage._count !== null && "_all" in usage._count && typeof usage._count._all === "number" ? usage._count._all : 0; })(),
       })),
     });
   } catch (error) {
