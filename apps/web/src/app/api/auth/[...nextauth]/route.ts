@@ -7,7 +7,7 @@ async function guardSignIn(request: Request) {
   if (pathname !== "/api/auth/signin" && !pathname.startsWith("/api/auth/signin/")) return null;
 
   try {
-    const result = await consumeAuthRateLimit(clientAddressFromHeaders(request.headers));
+    const result = await consumeAuthRateLimit(`ip:${clientAddressFromHeaders(request.headers)}`);
     if (!result.allowed) {
       return Response.json(
         { error: "Too many sign-in attempts. Please try again later." },
