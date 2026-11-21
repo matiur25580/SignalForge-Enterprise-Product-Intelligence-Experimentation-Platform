@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -68,8 +69,8 @@ export function WorkspaceDashboard({ organizations }: { organizations: Organizat
                   <span className="rounded-full bg-[var(--accent-soft)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--mint)]">{organization.role}</span>
                 </div>
                 <div className="mt-5 flex flex-wrap gap-2">
-                  <a className="action-primary" href={`/organizations/${organization.id}/team`}>Manage team <span aria-hidden="true">↗</span></a>
-                  <a className="action-secondary" href={`/organizations/${organization.id}/projects`}>Projects</a>
+                  <Link className="action-primary" href={`/organizations/${organization.id}/team`}>Manage team <span aria-hidden="true">↗</span></Link>
+                  <Link className="action-secondary" href={`/organizations/${organization.id}/projects`}>Projects</Link>
                 </div>
               </article>
             ))}
