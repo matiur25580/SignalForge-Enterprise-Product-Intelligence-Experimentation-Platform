@@ -36,7 +36,10 @@ export async function reserveIngestionQuota(
     Math.floor(receivedAt.getTime() / INGESTION_LIMITS.windowMs) * INGESTION_LIMITS.windowMs,
   );
 
-  const rows = await tx.$queryRaw<IngestionQuotaState[]>(Prisma.sql`
+  const rows = await tx.$queryRaw<Array<{
+    remainingRequests: bigint | number;
+    remainingEvents: bigint | number;
+  }>>(Prisma.sql`
     INSERT INTO "IngestionRateLimit"
       ("apiKeyId", "windowStart", "requestCount", "eventCount", "updatedAt")
     VALUES
@@ -69,5 +72,11 @@ export async function reserveIngestionQuota(
       ${limits.eventsPerMinute} - "eventCount" AS "remainingEvents"
   `);
 
-  return rows[0] ?? null;
+  const row = rows[0];
+  return row
+    ? {
+        remainingRequests: Number(row.remainingRequests),
+        remainingEvents: Number(row.remainingEvents),
+      }
+    : null;
 }
