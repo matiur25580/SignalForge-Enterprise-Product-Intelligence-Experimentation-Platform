@@ -87,7 +87,7 @@ describe("organization invitation collection", () => {
     const response = await POST(request({ email: " Analyst@Example.com ", role: "MEMBER" }), params);
     const body = await response.json();
 
-    expect(response.status).toBe(201);
+    expect(response.status, JSON.stringify(body)).toBe(201);
     expect(body.invitation.email).toBe("analyst@example.com");
     expect(body.invitation.delivery).toBe("MANUAL");
     expect(body.invitation.acceptanceUrl).toContain("/invitations/accept?token=sf_inv_one_time_secret_token");
