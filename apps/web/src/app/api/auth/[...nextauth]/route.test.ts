@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
@@ -27,7 +28,7 @@ describe("Auth.js sign-in route protection", () => {
 
   it("rate limits direct GET OAuth initiation", async () => {
     mocks.consume.mockResolvedValue({ allowed: false, limit: 10, remaining: 0, retryAfterSeconds: 120 });
-    const response = await GET(new Request("https://example.test/api/auth/signin/github", { headers: { "x-real-ip": "203.0.113.10" } }));
+    const response = await GET(new NextRequest("https://example.test/api/auth/signin/github", { headers: { "x-real-ip": "203.0.113.10" } }));
     expect(response.status).toBe(429);
     expect(response.headers.get("retry-after")).toBe("120");
     expect(mocks.get).not.toHaveBeenCalled();
@@ -35,13 +36,13 @@ describe("Auth.js sign-in route protection", () => {
 
   it("rate limits direct POST OAuth initiation", async () => {
     mocks.consume.mockResolvedValue({ allowed: false, limit: 10, remaining: 0, retryAfterSeconds: 60 });
-    const response = await POST(new Request("https://example.test/api/auth/signin/github", { method: "POST" }));
+    const response = await POST(new NextRequest("https://example.test/api/auth/signin/github", { method: "POST" }));
     expect(response.status).toBe(429);
     expect(mocks.post).not.toHaveBeenCalled();
   });
 
   it("does not apply the sign-in limiter to OAuth callbacks", async () => {
-    const response = await GET(new Request("https://example.test/api/auth/callback/github"));
+    const response = await GET(new NextRequest("https://example.test/api/auth/callback/github"));
     expect(response.status).toBe(200);
     expect(mocks.consume).not.toHaveBeenCalled();
     expect(mocks.get).toHaveBeenCalledOnce();
