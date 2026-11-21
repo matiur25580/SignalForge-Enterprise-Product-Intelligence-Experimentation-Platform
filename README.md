@@ -36,7 +36,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 | Team management | Secure email-bound invitations, member directory, role administration, guarded removal, single-use acceptance, revocation, audit trail, and interactive team UI |
 | Workspace UI | Authenticated organization dashboard, workspace creation, project registry, team administration, and invitation token handling |
 | Projects | Organization-scoped project creation and listing |
-| API credentials | Cryptographically random secrets, SHA-256 hash-only storage, one-time display, expiry, revocation, and interactive organization key console |
+| API credentials | Cryptographically random secrets, SHA-256 hash-only storage, one-time display, expiry, revocation, atomic audited rotation, and interactive organization key console |
 | Event ingestion | Strictly validated batch endpoint, bounded payloads, server-derived environment, and duplicate protection |
 | Rate limiting | Atomic PostgreSQL per-key limits: 120 requests and 10,000 submitted events per minute |
 | Usage intelligence | Authenticated organization usage report with project and API-key breakdowns, dashboard summaries, and plan entitlement visibility |
@@ -82,7 +82,7 @@ The endpoint validates the payload, verifies API-key scope and lifecycle state, 
 
 ### Organization usage reporting
 
-`GET /api/organizations/:organizationId/usage` returns organization-scoped event totals and per-project/API-key breakdowns. It defaults to the trailing 30 days and accepts ISO-8601 `from` and `to` parameters for custom windows up to 90 days. Ingestion entitlements are enforced per API key using the organization’s Free, Pro, or Enterprise plan. The public `GET /api/plans` endpoint publishes the plan catalog. Organization admins can inspect API-key usage and plan entitlements in the workspace UI. The API-key console supports secure creation, one-time secret copying, metadata listing, and revocation. A safe manual rotation procedure is to create a replacement key, deploy it to the integration, verify traffic, then revoke the old key. This is not payment processing or a subscription checkout system. See [API keys](docs/API-KEYS.md), [Usage metering](docs/USAGE-METERING.md), and [Subscription plans](docs/SUBSCRIPTION-PLANS.md).
+`GET /api/organizations/:organizationId/usage` returns organization-scoped event totals and per-project/API-key breakdowns. It defaults to the trailing 30 days and accepts ISO-8601 `from` and `to` parameters for custom windows up to 90 days. Ingestion entitlements are enforced per API key using the organization’s Free, Pro, or Enterprise plan. The public `GET /api/plans` endpoint publishes the plan catalog. Organization admins can inspect API-key usage and plan entitlements in the workspace UI. The API-key console supports secure creation, one-time secret copying, metadata listing, revocation, and atomic rotation. Rotation revokes the old key and creates a replacement with preserved project scope and expiry in one audited transaction; the replacement secret is shown once. This is not payment processing or a subscription checkout system. See [API keys](docs/API-KEYS.md), [Usage metering](docs/USAGE-METERING.md), and [Subscription plans](docs/SUBSCRIPTION-PLANS.md).
 
 ## Architecture
 
