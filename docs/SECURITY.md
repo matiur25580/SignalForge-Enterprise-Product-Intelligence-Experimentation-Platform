@@ -22,6 +22,15 @@
 - API key records are designed to store a hash and non-secret prefix only.
 - Audit records are organization-scoped and indexed by time.
 
+## Active session controls
+
+- Auth.js database sessions can be listed by the authenticated account at `GET /api/account/sessions`.
+- The response includes expiry and a current-session marker, but never returns raw session tokens.
+- Public session identifiers are SHA-256 digests of the underlying token and are resolved only against the signed-in user's unexpired sessions.
+- `DELETE /api/account/sessions` revokes one matching session after verifying ownership. The current browser session is deliberately protected; use the sign-out flow to end it.
+- Session inventory responses are private and non-cacheable. Expired sessions are excluded from the active list.
+- The account security page is available at `/account/security`.
+
 ## Before production
 
 This is an initial security baseline, not a production security certification. Add:
