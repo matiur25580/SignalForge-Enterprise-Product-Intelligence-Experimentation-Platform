@@ -57,10 +57,13 @@ Last updated: 2026-11-21
 
 ## Verification
 
-The latest fully successful baseline before the team-management module is GitHub Actions run [44877630419](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44877630419). It applied the committed migrations to ephemeral PostgreSQL 16, passed 19 tests, lint, TypeScript checks, and the production build.
+The latest GitHub Actions run [44878464322](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44878464322) passed all workflow stages:
+- dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
+- Prisma Client generation and schema validation
+- all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
+- all 39 automated tests across 10 test files
+- ESLint
+- TypeScript typecheck
+- Next.js production build
 
-The invitation schema and migration were validated by successful CI runs [44877771020](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44877771020) and [44877777171](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44877777171). Invitation creation/listing, acceptance, and revocation test commits also passed their CI runs [44877837575](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44877837575), [44877849779](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44877849779), and [44877859945](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44877859945).
-
-Subsequent CI attempts for member-management changes encountered an npm registry 404 while downloading the Rollup package during dependency installation; those runs did not reach tests or compilation. The latest member-management and token-helper test suite therefore still requires a clean successful CI run. This registry failure is not being represented as a code-test result.
-
-CI uses an ephemeral database and does not verify production credentials, live OAuth configuration, email delivery, production infrastructure, or a deployed application. No production database migration or deployment has been performed.
+This validates the repository's CI environment, not production credentials, live OAuth configuration, email delivery, production infrastructure, or a deployed application. No production database migration or deployment has been performed.
