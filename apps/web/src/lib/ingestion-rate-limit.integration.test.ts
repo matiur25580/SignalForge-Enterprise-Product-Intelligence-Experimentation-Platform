@@ -55,6 +55,12 @@ describe("reserveIngestionQuota (PostgreSQL integration)", () => {
 
   it("rejects a batch that would exceed the event quota without consuming it", async () => {
     const nextWindow = new Date(Date.now() + 120_000);
+    const oversized = await prisma.$transaction((tx) =>
+      reserveIngestionQuota(tx, apiKeyId, 6, nextWindow, {
+        requestsPerMinute: 10,
+        eventsPerMinute: 5,
+      }),
+    );
     const first = await prisma.$transaction((tx) =>
       reserveIngestionQuota(tx, apiKeyId, 4, nextWindow, {
         requestsPerMinute: 10,
@@ -68,6 +74,7 @@ describe("reserveIngestionQuota (PostgreSQL integration)", () => {
       }),
     );
 
+    expect(oversized).toBeNull();
     expect(first).toMatchObject({ remainingRequests: 9, remainingEvents: 1 });
     expect(rejected).toBeNull();
   });
