@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { apiError, requireOrganizationMember } from "@/lib/tenant";
 import { generateInvitationToken } from "@/lib/invitations";
 import { sendOrganizationInvitationEmail } from "@/lib/invitation-email";
+import { clientAddressFromHeaders, consumeSharedRateLimit, INVITATION_CREATE_RATE_LIMIT, rateLimitResponse } from "@/lib/auth-rate-limit";
 
 type RouteContext = { params: Promise<{ organizationId: string }> };
 
@@ -49,6 +50,13 @@ export async function POST(request: Request, { params }: RouteContext) {
   try {
     const { organizationId } = await params;
     const { user, membership: actor } = await requireOrganizationMember(organizationId, ["OWNER", "ADMIN"]);
+    let limit;
+    try {
+      limit = await consumeSharedRateLimit(`invitation:create:${organizationId}:${user.id}:ip:${clientAddressFromHeaders(request.headers)}`, INVITATION_CREATE_RATE_LIMIT);
+    } catch {
+      return Response.json({ error: "Invitation creation is temporarily unavailable" }, { status: 503 });
+    }
+    if (!limit.allowed) return rateLimitResponse(limit.retryAfterSeconds, limit.limit);
     const input = createInvitationSchema.parse(await request.json());
     if (actor.role !== "OWNER" && input.role === "ADMIN") {
       return Response.json({ error: "Only an owner can invite another administrator" }, { status: 403 });
