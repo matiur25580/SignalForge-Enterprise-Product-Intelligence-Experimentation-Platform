@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { apiError, requireOrganizationMember } from "@/lib/tenant";
 import { generateInvitationToken } from "@/lib/invitations";
+import { sendOrganizationInvitationEmail } from "@/lib/invitation-email";
 
 type RouteContext = { params: Promise<{ organizationId: string }> };
 
@@ -99,12 +100,43 @@ export async function POST(request: Request, { params }: RouteContext) {
       return saved;
     });
 
+    const organization = await prisma.organization.findUnique({
+      where: { id: organizationId },
+      select: { name: true },
+    });
+    const baseUrl = process.env.NEXTAUTH_URL ?? process.env.AUTH_URL;
+    const acceptanceUrl = `${baseUrl?.replace(/\\/$/, "") ?? "http://localhost:3000"}/invitations/accept?token=${encodeURIComponent(generated.secret)}`;
+
+    try {
+      const delivery = await sendOrganizationInvitationEmail({
+        email: invitation.email,
+        organizationName: organization?.name ?? "your organization",
+        inviterName: user.name ?? user.email ?? "A SignalForge administrator",
+        role: invitation.role,
+        acceptanceUrl,
+        expiresAt: invitation.expiresAt,
+      });
+
+      if (delivery.delivered) {
+        return Response.json({
+          invitation: { ...invitation, status: "PENDING", delivery: "EMAIL_SENT" },
+        }, { status: 201 });
+      }
+    } catch {
+      return Response.json({
+        error: "Invitation was created but email delivery failed. Resend it after checking the email provider configuration.",
+        invitationId: invitation.id,
+      }, { status: 502 });
+    }
+
     return Response.json({
       invitation: {
         ...invitation,
         status: "PENDING",
+        delivery: "MANUAL",
         acceptanceToken: generated.secret,
-        warning: "Deliver this token securely. It is shown only once and is never stored in plaintext.",
+        acceptanceUrl,
+        warning: "Email delivery is not configured. Share this single-use link securely; it will not be shown again.",
       },
     }, { status: 201 });
   } catch (error) {
