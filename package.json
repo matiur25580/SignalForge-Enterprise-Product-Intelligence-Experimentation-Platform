@@ -11,7 +11,8 @@
     "db:generate": "pnpm --filter @signalforge/web db:generate",
     "db:migrate": "pnpm --filter @signalforge/web db:migrate",
     "db:deploy": "pnpm --filter @signalforge/web db:deploy",
-    "db:studio": "pnpm --filter @signalforge/web db:studio"
+    "db:studio": "pnpm --filter @signalforge/web db:studio",
+    "test": "pnpm --filter @signalforge/web test"
   },
   "engines": {
     "node": ">=20"
