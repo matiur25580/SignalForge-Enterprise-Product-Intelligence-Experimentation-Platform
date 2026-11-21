@@ -1,6 +1,6 @@
 import { channel } from "node:diagnostics_channel";
 import { randomBytes } from "node:crypto";
-import { recordHttpRequest } from "./src/lib/observability-runtime";
+import { normalizeHttpRoute, recordHttpRequest } from "./src/lib/observability-runtime";
 
 type IncomingRequest = {
   method?: string;
@@ -89,7 +89,7 @@ export async function register() {
     const request = message.request;
     const response = message.response;
     if (!request || !response) return;
-    const pathname = (request.url || "/").split("?")[0] || "/";
+    const pathname = normalizeHttpRoute((request.url || "/").split("?")[0] || "/");
     if (pathname === "/api/internal/metrics") return;
     const trace = parseTraceParent(header(request, "traceparent"));
     const sampled = Boolean(trace?.sampled);
