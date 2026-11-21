@@ -7,7 +7,11 @@
     "dev": "pnpm --filter @signalforge/web dev",
     "build": "pnpm --filter @signalforge/web build",
     "lint": "pnpm --filter @signalforge/web lint",
-    "typecheck": "pnpm --filter @signalforge/web typecheck"
+    "typecheck": "pnpm --filter @signalforge/web typecheck",
+    "db:generate": "pnpm --filter @signalforge/web db:generate",
+    "db:migrate": "pnpm --filter @signalforge/web db:migrate",
+    "db:deploy": "pnpm --filter @signalforge/web db:deploy",
+    "db:studio": "pnpm --filter @signalforge/web db:studio"
   },
   "engines": {
     "node": ">=20"
