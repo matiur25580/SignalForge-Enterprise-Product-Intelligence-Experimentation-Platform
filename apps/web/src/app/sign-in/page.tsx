@@ -1,6 +1,6 @@
 import { signIn } from "../../../auth";
 
-export default function SignInPage() {
+export default async function SignInPage({ searchParams }: { searchParams: Promise<{ callbackUrl?: string }> }) {\n  const { callbackUrl } = await searchParams;\n  const redirectTo = callbackUrl?.startsWith("/") && !callbackUrl.startsWith("//") && !callbackUrl.includes("\\\\") ? callbackUrl : "/";
   return (
     <main className="grid min-h-screen place-items-center px-6">
       <section className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8">
@@ -11,7 +11,7 @@ export default function SignInPage() {
         </p>
         <form className="mt-8" action={async () => {
           "use server";
-          await signIn("github", { redirectTo: "/" });
+          await signIn("github", { redirectTo });
         }}>
           <button type="submit" className="w-full rounded-xl bg-[var(--accent)] px-4 py-3 text-sm font-bold text-[#091020] transition hover:opacity-90">
             Continue with GitHub
