@@ -26,14 +26,11 @@ Project and expiration fields are optional. A supplied project must belong to th
 
 Requires OWNER or ADMIN role. Revocation is soft and auditable. Revoked keys remain in the database for historical audit purposes.
 
-## Safe manual rotation
+## Atomic key rotation
 
-There is no atomic one-click rotation endpoint yet. Use a staged replacement to avoid interrupting production ingestion:
+`POST /api/organizations/:organizationId/api-keys/:apiKeyId` requires OWNER or ADMIN. It generates a new 256-bit secret, revokes the old credential, creates the replacement with the same organization, project scope, name, and expiry, and writes audit records for both sides of the rotation in one database transaction. The old credential is revoked immediately; the new raw secret is returned exactly once. Copy it and update the integration secret store immediately.
 
-1. Create a replacement key with the same project scope and an appropriate expiry.
-2. Store the new secret in your deployment secret manager; do not commit it.
-3. Update the integration and verify successful event ingestion using the replacement.
-4. Revoke the old key from the console only after the replacement is confirmed healthy.
+Rotation is rejected for missing, already-revoked, or expired keys. Expired keys are not silently extended; create a new key with an explicit expiry policy instead. A concurrent rotation attempt is rejected if another request has already changed the original key.
 
 ## Key format and storage
 
