@@ -6,7 +6,7 @@ SignalForge supports secure, organization-scoped team invitations with role assi
 
 1. An authenticated organization OWNER or ADMIN creates an invitation for an email address.
 2. The API normalizes the address, limits the assignable role to ADMIN, MEMBER, or VIEWER, and creates a cryptographically random one-time token.
-3. Only a SHA-256 hash of the token is stored. The raw token is returned once in the create response so an operator can deliver it through an approved secure channel.
+3. Only a SHA-256 hash of the token is stored. When Resend is configured, SignalForge sends a single-use acceptance link by email and does not return the raw token. Without email configuration, the API returns the complete acceptance URL once for secure manual delivery.
 4. The invitee signs in with GitHub using the same email address and submits the token to the acceptance endpoint.
 5. The API verifies token hash, email match, expiry, and pending state, then atomically marks the invitation accepted, creates organization membership, and writes an audit record.
 6. OWNER/ADMIN users can list and revoke pending invitations. Expired or revoked invitations cannot be accepted.
@@ -38,7 +38,7 @@ Requires OWNER or ADMIN.
 
 Allowed roles: `ADMIN`, `MEMBER`, `VIEWER`. OWNER cannot be assigned by invitation. Only an OWNER can issue an ADMIN invitation.
 
-The 201 response includes `acceptanceToken` exactly once. Deliver it securely to the intended invitee. SignalForge does not yet send invitation email automatically; email delivery provider integration is a separate roadmap item.
+When `RESEND_API_KEY` and `EMAIL_FROM` are configured, the 201 response reports `delivery: EMAIL_SENT`; the token is never returned to the caller. Without those settings, the response reports `delivery: MANUAL` and includes `acceptanceUrl` exactly once. Email delivery failures return 502 without exposing the token; resend the invitation after checking provider configuration.
 
 ### Revoke an invitation
 
@@ -101,7 +101,7 @@ OWNER can remove non-owner members. ADMIN can remove MEMBER and VIEWER only. Own
 
 ## Current limitations
 
-- No email provider integration or automated delivery.
+- Resend is the supported email adapter; configure `RESEND_API_KEY`, `EMAIL_FROM`, and the externally reachable `AUTH_URL`/`NEXTAUTH_URL` to enable delivery.
 - The authenticated team-management UI supports invite creation, one-time token copying, member role changes/removal, and pending invitation revocation.\n- No invitee-facing invitation acceptance UI or automatic email delivery yet; the acceptance API is available.
 - Organization member role changes and member removal are not yet implemented.
 - The GitHub OAuth account email is used as the invitation identity.
