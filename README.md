@@ -15,6 +15,7 @@ SignalForge is an event-driven product analytics and experimentation platform de
 - Organization-scoped project listing and creation APIs
 - Server-side membership checks; only owners and admins can create projects
 - Transactional audit events for organization and project creation
+- GitHub Actions CI workflow for Prisma validation, lint, typecheck, and build
 
 ## Product roadmap
 
