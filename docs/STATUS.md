@@ -18,7 +18,7 @@ Last updated: 2026-11-21
 - [x] API key issuance with cryptographically random secrets, hash-only persistence, one-time display, expiry, listing, revocation, and atomic audited rotation
 - [x] Hash-based ingestion authentication with expiry and revocation checks
 - [x] Organization member directory
-- [x] Secure invitation creation, reissue, seven-day expiry, single-use acceptance, and revocation
+- [x] Secure invitation creation, reissue, seven-day expiry, single-use acceptance, and revocation\n- [x] Optional Resend email delivery with a one-time manual-link fallback and no raw-token disclosure when email is sent
 - [x] Invitation tokens stored as SHA-256 hashes and bound to the authenticated account email
 - [x] OWNER/ADMIN role hierarchy for member role changes and member removal
 - [x] Transactional audit records for invitation and membership lifecycle actions
@@ -45,7 +45,7 @@ Last updated: 2026-11-21
 
 ## Not implemented yet
 
-- [ ] Automatic invitation email delivery and invitee invitation acceptance UI
+- [ ] Dedicated invitee invitation acceptance UI and provider-delivery integration tests
 - [ ] Ownership transfer and owner lifecycle workflows
 - [ ] Local application setup and production runtime/database verification
 - [ ] Self-service key lifecycle policies and configurable rotation schedules
@@ -60,7 +60,7 @@ Last updated: 2026-11-21
 
 ## Verification
 
-The latest verified GitHub Actions run [44879418883](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44879418883) passed the application UI changes with 39 tests. Atomic API-key rotation and its new route tests were added afterward; their CI verification is pending.
+The latest verified GitHub Actions run [44879418883](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44879418883) passed the application UI changes with 39 tests. Atomic API-key rotation, invitation email delivery, and their new code changes were added afterward; their CI verification is pending.
 - dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
 - Prisma Client generation and schema validation
 - all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
