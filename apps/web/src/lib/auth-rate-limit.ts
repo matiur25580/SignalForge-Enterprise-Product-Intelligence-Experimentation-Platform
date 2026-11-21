@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 export const AUTH_RATE_LIMIT = { windowMs: 15 * 60 * 1000, maxAttempts: 10 };
 export const ORGANIZATION_CREATE_RATE_LIMIT = { windowMs: 60 * 60 * 1000, maxAttempts: 3 };
 export const PROJECT_CREATE_RATE_LIMIT = { windowMs: 60 * 60 * 1000, maxAttempts: 20 };
+export const API_KEY_CREATE_RATE_LIMIT = { windowMs: 60 * 60 * 1000, maxAttempts: 10 };
+export const INVITATION_CREATE_RATE_LIMIT = { windowMs: 60 * 60 * 1000, maxAttempts: 10 };
+export const MEMBER_MUTATION_RATE_LIMIT = { windowMs: 60 * 60 * 1000, maxAttempts: 30 };
 type RateLimitRow = { requestCount: number; windowStartedAt: Date };
 
 export function hashRateLimitSubject(subject: string) {
