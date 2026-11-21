@@ -22,6 +22,14 @@
 - API key records are designed to store a hash and non-secret prefix only.
 - Audit records are organization-scoped and indexed by time.
 
+## Authentication abuse protection
+
+- GitHub OAuth sign-in initiation is rate-limited to 10 attempts per client address per 15-minute fixed window, both through the sign-in server action and direct Auth.js sign-in endpoints.
+- Rate-limit counters are stored in PostgreSQL, so limits are shared across application instances rather than relying on per-process memory.
+- Client addresses are keyed with SHA-256 and the application auth secret before persistence; raw IP addresses are not stored in the limiter table.
+- Requests over the limit receive HTTP 429 with `Retry-After` and rate-limit headers. If the limiter database is unavailable, sign-in initiation fails closed with HTTP 503 or a retry notice rather than silently bypassing protection.
+- The migration creates `AuthRateLimit`; deploy the database migration before running the updated application.
+
 ## Active session controls
 
 - Auth.js database sessions can be listed by the authenticated account at `GET /api/account/sessions`.
