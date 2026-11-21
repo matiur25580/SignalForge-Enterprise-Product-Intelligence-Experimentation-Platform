@@ -9,7 +9,9 @@ function randomHex(bytes: number) {
 export function middleware(request: NextRequest) {
   const incoming = request.headers.get("traceparent");
   const valid = incoming && /^00-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$/i.test(incoming);
-  const traceparent = valid ? incoming : `00-${randomHex(16)}-${randomHex(8)}-01`;
+  const rate = Number(process.env.OTEL_TRACES_SAMPLE_RATE ?? "0.1");
+  const sampled = valid ? incoming!.endsWith("-01") : Math.random() < (Number.isFinite(rate) ? Math.min(1, Math.max(0, rate)) : 0.1);
+  const traceparent = valid ? incoming : `00-${randomHex(16)}-${randomHex(8)}-${sampled ? "01" : "00"}`;
   const requestId = traceparent.split("-")[1];
   const headers = new Headers(request.headers);
   headers.set("traceparent", traceparent);
