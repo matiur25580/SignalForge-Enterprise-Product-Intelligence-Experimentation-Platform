@@ -2,7 +2,7 @@ type RequestMetric = { count: number; errors: number; durationSum: number; bucke
 const BUCKETS = [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10];
 const metrics = new Map<string, RequestMetric>();
 
-function safeRoute(pathname: string) {
+export function normalizeHttpRoute(pathname: string) {
   return pathname
     .split("/")
     .map((segment) => {
@@ -15,7 +15,7 @@ function safeRoute(pathname: string) {
 }
 
 export function recordHttpRequest(method: string, pathname: string, status: number, durationSeconds: number) {
-  const route = safeRoute(pathname);
+  const route = normalizeHttpRoute(pathname);
   const key = `${method.toUpperCase()} ${route} ${Math.floor(status / 100)}xx`;
   const current = metrics.get(key) ?? { count: 0, errors: 0, durationSum: 0, buckets: BUCKETS.map(() => 0) };
   current.count += 1;
