@@ -71,6 +71,9 @@ export function WorkspaceDashboard({ organizations }: { organizations: Organizat
                 <div className="mt-5 flex flex-wrap gap-2">
                   <Link className="action-primary" href={`/organizations/${organization.id}/team`}>Manage team <span aria-hidden="true">↗</span></Link>
                   <Link className="action-secondary" href={`/organizations/${organization.id}/projects`}>Projects</Link>
+                  <Link className="action-secondary" href={`/organizations/${organization.id}/api-keys`}>API keys</Link>
+                  <Link className="action-secondary" href={`/organizations/${organization.id}/usage`}>Usage</Link>
+                  <Link className="action-secondary" href={`/organizations/${organization.id}/billing`}>Plan & billing</Link>
                 </div>
               </article>
             ))}
