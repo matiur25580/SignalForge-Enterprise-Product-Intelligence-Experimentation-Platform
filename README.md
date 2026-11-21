@@ -1,102 +1,313 @@
+<div align="center">
+
 # SignalForge
 
-**Enterprise Product Intelligence & Experimentation Platform**
+### Product Intelligence. Experimentation. Decisions backed by evidence.
 
-SignalForge is an event-driven product analytics and experimentation platform designed to help teams understand user behaviour, measure product outcomes, and make statistically responsible decisions.
+**An enterprise-minded product analytics platform designed to turn behavioral signals into confident product decisions.**
 
-> **Build status:** Multi-tenant identity, API-key management, and PostgreSQL-backed event ingestion with atomic per-key quotas are implemented. CI applies migrations to a clean PostgreSQL service and exercises quota concurrency against the database. Production runtime verification and deployment remain outstanding.
+[![CI](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/workflows/ci.yml)
+![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)
+![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?logo=prisma)
+![License](https://img.shields.io/badge/License-Not%20yet%20selected-lightgrey)
 
-## Implemented foundations
+[Architecture](#architecture) · [Capabilities](#implemented-capabilities) · [Dashboard concepts](#dashboard-concepts) · [Getting started](#getting-started) · [Roadmap](#roadmap)
 
-- Next.js 15 App Router application with TypeScript and Tailwind CSS
-- Auth.js GitHub OAuth with database-backed Prisma sessions
-- PostgreSQL data model for users, organizations, memberships, projects, API keys, audit logs, and product events
-- Organization creation and membership listing APIs
-- Organization-scoped project listing and creation APIs
-- Server-side membership checks; only owners and admins can create projects and manage API keys
-- Hash-only API-key storage, one-time secret issuance, expiry and revocation checks
-- Project-scoped batch event ingestion with strict validation and duplicate protection
-- Atomic per-API-key limits: 120 requests and 10,000 submitted events per minute, with HTTP 429 retry guidance
-- PostgreSQL concurrency tests proving quota enforcement under simultaneous requests
-- Authenticated organization usage API with 30-day default reporting, bounded 90-day custom windows, and project/API-key event breakdowns
-- Committed PostgreSQL migrations and CI migration-apply verification
+</div>
 
-## Product roadmap
+---
 
-- Product SDK, plan-based quotas, usage metering, and API-key rotation
-- Durable event transport and processing with Kafka-compatible infrastructure
-- ClickHouse-backed funnels, journeys, cohorts, retention, and feature adoption analytics
-- Feature flags and controlled rollouts
-- Experiment lifecycle management, sample-ratio checks, and statistical readouts
-- Evidence-linked anomaly explanations and natural-language analysis
-- Usage metering, integrations, governance, and operational observability
+## Why SignalForge?
 
-## Architecture principles
+Product teams collect events, run experiments, and ship features—but the evidence is often scattered across disconnected tools. SignalForge is being built as a unified workspace for understanding product behavior, measuring outcomes, governing releases, and making decisions with trustworthy data.
 
-- Tenant identity is derived from the authenticated session, never trusted from request payloads.
-- Operational entities live in PostgreSQL; high-volume event analytics will use a column-oriented analytical store.
-- Event processing uses explicit contracts, stable event IDs, and idempotency.
-- AI explanations will be grounded in validated query results.
-- Features are documented as implemented only after code and checks are verified.
+The project emphasizes the engineering foundations behind a credible SaaS product: tenant isolation, scoped credentials, idempotent ingestion, atomic quotas, auditable actions, and automated verification.
 
-## Repository layout
+> **Current implementation status:** The repository contains a working Next.js application foundation and backend APIs for multi-tenant identity, projects, API keys, event ingestion, per-key quotas, and organization usage reporting. The 12 dashboard images below are **conceptual product-design previews with illustrative data**, not screenshots of currently implemented live dashboard pages. Production deployment and runtime verification have not been performed.
 
-```text
-apps/web/
-  prisma/             PostgreSQL schema and migrations
-  src/app/            Next.js routes and UI
-  src/lib/             Database, API-key, and tenant authorization helpers
-  auth.ts              Auth.js configuration
-docs/                  Architecture, security, API, and database guides
+## Implemented capabilities
+
+| Area | Current implementation |
+|---|---|
+| Identity | Auth.js GitHub OAuth and database-backed sessions |
+| Multi-tenancy | Organizations, memberships, roles, and server-side access checks |
+| Projects | Organization-scoped project creation and listing |
+| API credentials | Cryptographically random secrets, SHA-256 hash-only storage, one-time display, expiry, and revocation |
+| Event ingestion | Strictly validated batch endpoint, bounded payloads, server-derived environment, and duplicate protection |
+| Rate limiting | Atomic PostgreSQL per-key limits: 120 requests and 10,000 submitted events per minute |
+| Usage intelligence | Authenticated organization usage report with project and API-key breakdowns |
+| Auditability | Transactional audit records for organization, project, and API-key lifecycle actions |
+| Database delivery | Committed Prisma migrations applied against clean PostgreSQL in CI |
+| Quality gates | Vitest, ESLint, TypeScript checks, Prisma validation, and production build in GitHub Actions |
+
+### Event ingestion contract
+
+Send batches to `POST /api/v1/events` with a project ID and an API key:
+
+```http
+POST /api/v1/events
+Authorization: Bearer sf_live_<secret>
+Content-Type: application/json
 ```
 
-## Local setup
+```json
+{
+  "projectId": "your_project_cuid",
+  "events": [
+    {
+      "eventId": "checkout-0001",
+      "eventName": "checkout.completed",
+      "timestamp": "2026-11-21T10:30:00.000Z",
+      "userId": "user-123",
+      "properties": {
+        "currency": "INR",
+        "total": 1299
+      }
+    }
+  ]
+}
+```
 
-Prerequisites: Node.js 20+, pnpm 10+, and PostgreSQL.
+The endpoint validates the payload, verifies API-key scope and lifecycle state, enforces per-key request/event quotas in PostgreSQL, persists events with project-scoped idempotency, and reports accepted/duplicate counts. See [Event ingestion](docs/EVENT-INGESTION.md).
 
-1. Copy `.env.example` to `.env`.
-2. Create a PostgreSQL database named `signalforge`.
-3. Create a GitHub OAuth application with callback URL `http://localhost:3000/api/auth/callback/github`.
-4. Set `DATABASE_URL`, `AUTH_SECRET`, `AUTH_GITHUB_ID`, and `AUTH_GITHUB_SECRET` in `.env`.
-5. Install dependencies, generate Prisma Client, and apply committed migrations:
+### Organization usage reporting
+
+`GET /api/organizations/:organizationId/usage` returns organization-scoped event totals and per-project/API-key breakdowns. It defaults to the trailing 30 days and accepts ISO-8601 `from` and `to` parameters for custom windows up to 90 days. This is usage visibility—not subscription billing, payment processing, or plan-based quota enforcement. See [Usage metering](docs/USAGE-METERING.md).
+
+## Architecture
+
+SignalForge currently follows a modular-monolith approach for its control plane. High-volume analytical infrastructure is part of the roadmap and is not represented as already deployed.
+
+```mermaid
+flowchart LR
+    Client[Product / Server SDK] -->|Bearer API key| Ingest[Next.js Event API]
+    User[Workspace User] -->|GitHub OAuth| Web[Next.js App]
+    Web --> Auth[Auth.js + Tenant Authorization]
+    Auth --> PG[(PostgreSQL)]
+    Ingest --> KeyAuth[API Key Verification]
+    KeyAuth --> Quota[Atomic Per-Key Quotas]
+    Quota --> Events[Validated Event Persistence]
+    Events --> PG
+    Web --> Usage[Organization Usage API]
+    Usage --> PG
+    PG --> Audit[Audit Trail]
+    Events -. future .-> Queue[Kafka-compatible Transport]
+    Queue -. future .-> OLAP[(ClickHouse Analytics)]
+    OLAP -. future .-> Insights[Funnels · Cohorts · Experiments]
+```
+
+### Engineering principles
+
+- **Tenant isolation:** Organization ownership and membership are verified server-side; request payloads never define tenant scope.
+- **Credential hygiene:** API secrets are shown once; only their SHA-256 hashes are persisted.
+- **Idempotency:** Event IDs are unique within a project, preventing duplicate persistence on retries.
+- **Atomic quotas:** PostgreSQL upserts reserve request and event capacity safely under concurrent traffic.
+- **Transactional consistency:** Quota reservation and event persistence share a transaction.
+- **Auditability:** Sensitive lifecycle operations produce organization-scoped audit records.
+- **Honest observability:** Empty or unimplemented product areas are not presented as live metrics.
+
+## Dashboard concepts
+
+The following 12 screens illustrate the intended product experience and information architecture. They are original SVG design previews, presented in a **single vertical column** for easy review. All figures, activity rows, and chart values are illustrative; these screens are not wired to live product data.
+
+### 01 · Executive overview
+A high-level workspace snapshot for activation, engagement, conversion, and overall product health.
+
+![SignalForge executive overview dashboard concept](docs/images/dashboard-01-executive-overview.svg)
+
+### 02 · Event intelligence
+An operational view of event volume, accepted traffic, duplicate rates, and source health.
+
+![SignalForge event intelligence dashboard concept](docs/images/dashboard-02-event-intelligence.svg)
+
+### 03 · Conversion funnels
+A focused analysis surface for conversion steps, drop-off points, and checkout performance.
+
+![SignalForge conversion funnels dashboard concept](docs/images/dashboard-03-conversion-funnels.svg)
+
+### 04 · User journeys
+A journey exploration workspace for understanding common paths, key transitions, and exits.
+
+![SignalForge user journeys dashboard concept](docs/images/dashboard-04-user-journeys.svg)
+
+### 05 · Cohorts & retention
+A retention view for comparing acquisition cohorts and tracking long-term engagement.
+
+![SignalForge cohorts and retention dashboard concept](docs/images/dashboard-05-cohorts-retention.svg)
+
+### 06 · Experimentation
+An experiment operations view for enrollment, outcome movement, and sample-ratio monitoring.
+
+![SignalForge experimentation dashboard concept](docs/images/dashboard-06-experimentation.svg)
+
+### 07 · Feature flags
+A release governance view for flag inventory, rollout coverage, and operational safety.
+
+![SignalForge feature flags dashboard concept](docs/images/dashboard-07-feature-flags.svg)
+
+### 08 · Audience cohorts
+A segmentation workspace for defining behavioral audiences and understanding their size.
+
+![SignalForge audience cohorts dashboard concept](docs/images/dashboard-08-audience-cohorts.svg)
+
+### 09 · Data quality
+A data observability concept for schema compliance, drift alerts, and event validation.
+
+![SignalForge data quality dashboard concept](docs/images/dashboard-09-data-quality.svg)
+
+### 10 · Usage & quotas
+An organization consumption view for event volume, API-key activity, and quota awareness.
+
+![SignalForge usage and quotas dashboard concept](docs/images/dashboard-10-usage-quotas.svg)
+
+### 11 · API key security
+A credential administration concept for key lifecycle, expiry hygiene, and revocation review.
+
+![SignalForge API key security dashboard concept](docs/images/dashboard-11-api-key-security.svg)
+
+### 12 · Audit & governance
+An accountability view for administrative activity, policy checks, and review workflows.
+
+![SignalForge audit and governance dashboard concept](docs/images/dashboard-12-audit-governance.svg)
+
+## Technology stack
+
+| Layer | Technology |
+|---|---|
+| Web application | Next.js 15 App Router, React 19 |
+| Language | TypeScript |
+| Styling | Tailwind CSS |
+| Authentication | Auth.js (GitHub OAuth) |
+| Operational database | PostgreSQL 16 |
+| ORM and migrations | Prisma 6 |
+| Validation | Zod |
+| Automated tests | Vitest |
+| CI | GitHub Actions |
+
+**Planned analytical and distributed systems:** ClickHouse, Redis, Kafka/Redpanda, background workers, OpenTelemetry, and a Python-based AI service. These are roadmap items, not current runtime dependencies.
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 20+
+- pnpm 10+
+- PostgreSQL 16+
+- A GitHub OAuth application
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform.git
+cd SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform
+```
+
+### 2. Configure environment variables
+
+Copy the example file and configure your local credentials:
+
+```bash
+cp .env.example .env
+```
+
+Required values:
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `AUTH_SECRET` | Auth.js session encryption secret |
+| `AUTH_GITHUB_ID` | GitHub OAuth client ID |
+| `AUTH_GITHUB_SECRET` | GitHub OAuth client secret |
+
+Set the GitHub OAuth callback URL to:
+
+```
+http://localhost:3000/api/auth/callback/github
+```
+
+Never commit your real `.env` file or production credentials.
+
+### 3. Install and initialize
 
 ```bash
 corepack enable
 pnpm install
 pnpm db:generate
 pnpm db:deploy
+```
+
+### 4. Run the application
+
+```bash
 pnpm dev
 ```
 
-Open http://localhost:3000. Visit `/sign-in` to authenticate with GitHub.
+Open [http://localhost:3000](http://localhost:3000) and sign in through GitHub OAuth.
 
-## Database commands
+### Useful commands
 
 ```bash
-pnpm db:generate   # Generate Prisma Client
-pnpm db:migrate    # Create/apply a development migration
-pnpm db:deploy     # Apply committed migrations
-pnpm db:studio     # Open Prisma Studio
+pnpm dev          # Start the web application
+pnpm test         # Run automated tests
+pnpm lint         # Run ESLint
+pnpm typecheck    # Run TypeScript checks
+pnpm build        # Create a production build
+pnpm db:generate  # Generate Prisma Client
+pnpm db:migrate   # Create/apply a development migration
+pnpm db:deploy    # Apply committed migrations
+pnpm db:studio    # Open Prisma Studio
 ```
 
-See [Automated tests](docs/TESTING.md), [Database migrations](docs/DATABASE.md), [Identity API](docs/IDENTITY.md), [Security baseline](docs/SECURITY.md), [API keys](docs/API-KEYS.md), and [Event ingestion](docs/EVENT-INGESTION.md), and [Usage metering](docs/USAGE-METERING.md).
+## Verification & delivery
 
-## Usage reporting
+GitHub Actions provisions an ephemeral PostgreSQL 16 service, generates Prisma Client, validates the Prisma schema, applies committed migrations, runs automated tests, and performs lint, typecheck, and production-build checks.
 
-Organization members can inspect event volume through `GET /api/organizations/:organizationId/usage`. The endpoint defaults to the trailing 30 days and accepts optional ISO-8601 `from` and `to` parameters (maximum 90 days). It returns organization-scoped totals and per-project/API-key breakdowns without exposing key hashes or secrets. See [docs/USAGE-METERING.md](docs/USAGE-METERING.md). This is usage visibility, not subscription billing or payment processing.
+- [View CI workflow](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/workflows/ci.yml)
+- [Implementation status](docs/STATUS.md)
+- [Testing guide](docs/TESTING.md)
 
-## Event ingestion
+CI success verifies the checks in that workflow; it does not imply that a production environment, live customer data, or external analytical infrastructure has been configured.
 
-Send a batch to `POST /api/v1/events` with `Authorization: Bearer sf_live_<secret>`. See [docs/EVENT-INGESTION.md](docs/EVENT-INGESTION.md) for the complete contract, limits, and current limitations.
+## Roadmap
 
-## Verification status
+- [x] Multi-tenant identity, organizations, roles, and project foundations
+- [x] Secure API-key lifecycle and scoped event ingestion
+- [x] Atomic per-key request and event quotas
+- [x] Organization-level usage reporting
+- [ ] Plan catalog, subscription lifecycle, and configurable plan-based quotas
+- [ ] API-key rotation workflow and usage threshold notifications
+- [ ] Product SDKs and durable event transport
+- [ ] ClickHouse-backed funnels, journeys, cohorts, and retention
+- [ ] Feature flag evaluation and controlled rollouts
+- [ ] Experiment assignment, sample-ratio checks, and statistical readouts
+- [ ] Evidence-linked anomaly detection and AI-assisted product analysis
+- [ ] Operational observability, integrations, and governance workflows
 
-GitHub Actions validates the Prisma schema, applies committed migrations to an ephemeral PostgreSQL 16 service, runs mocked ingestion/authentication tests plus PostgreSQL-backed quota concurrency tests, then runs lint, typecheck, and a production build. Production runtime verification and rollout are separate steps and are not implied by CI success.
+## Documentation
 
-## Security
+- [Database migrations](docs/DATABASE.md)
+- [Identity and organization APIs](docs/IDENTITY.md)
+- [Security baseline](docs/SECURITY.md)
+- [API key lifecycle](docs/API-KEYS.md)
+- [Event ingestion contract](docs/EVENT-INGESTION.md)
+- [Usage metering](docs/USAGE-METERING.md)
+- [Automated testing](docs/TESTING.md)
+- [Implementation status](docs/STATUS.md)
 
-Never commit credentials, private keys, production data, or real customer identifiers. Review [docs/SECURITY.md](docs/SECURITY.md) before connecting real users or data.
+## Contributing
+
+Issues and focused pull requests are welcome. For substantial changes, please open an issue first to discuss the proposed design. Keep changes scoped, add tests for behavior changes, and update documentation when contracts change.
 
 ## License
 
-A license will be selected and added before public distribution.
+No license has been selected yet. Until a license is added, the repository should not be treated as granting general permission to reuse, distribute, or modify its contents.
+
+---
+
+<div align="center">
+
+**SignalForge** · Evidence first. Product decisions with confidence.
+
+</div>
