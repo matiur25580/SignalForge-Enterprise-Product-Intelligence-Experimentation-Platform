@@ -24,14 +24,16 @@ Last updated: 2026-11-21
 
 ## Not implemented yet
 
-- [ ] Committed Prisma migration files
+- [ ] Committed Prisma migration files for the current schema (including the new Event model)
 - [ ] Local dependency installation and generated Prisma Client
 - [ ] Automated lint, typecheck, and production build verification
-- [ ] Automated authentication and tenant-isolation tests
+- [ ] Automated authentication, ingestion, deduplication, and tenant-isolation tests
 - [ ] Organization invitations and membership administration
-- [ ] API-key authentication middleware, rotation workflow, and usage metering
-- [ ] Event ingestion API and SDK
-- [ ] Durable event processing and idempotent consumers
+- [x] Hash-based API-key authentication for event ingestion, including expiry and revocation checks
+- [x] Project-scoped batch event ingestion with strict request validation and bounded payloads
+- [x] PostgreSQL event storage with project/event idempotency and duplicate reporting
+- [ ] API-key rotation workflow, rate limiting, quotas, and usage metering
+- [ ] SDK, durable event processing, and idempotent downstream consumers
 - [ ] ClickHouse analytics queries
 - [ ] Funnels, journeys, cohorts, and retention
 - [ ] Feature flags and experiment assignment
@@ -40,4 +42,4 @@ Last updated: 2026-11-21
 
 ## Verification
 
-GitHub source commits are present. No local PostgreSQL instance or configured OAuth application was available in this work session, so migrations and runtime checks were not executed. The implementation must be verified locally before production use.
+The latest GitHub Actions CI run before the event-ingestion changes passed dependency installation, Prisma Client generation, Prisma schema validation, lint, typecheck, and production build. The event-ingestion changes have not yet been covered by a CI run at the time of this update. No live PostgreSQL migration or runtime integration test has been executed. Generate and review the migration, then run database-backed tests before production use.
