@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const invitation = await prisma.organizationInvitation.findUnique({
       where: { tokenHash: hashInvitationToken(input.token) },
       select: {
-        id: true, organizationId: true, email: true, role: true,
+        id: true, organizationId: true, email: true, role: true, tokenHash: true,
         expiresAt: true, acceptedAt: true, revokedAt: true,
       },
     });
@@ -58,6 +58,7 @@ export async function POST(request: Request) {
         where: {
           id: invitation.id,
           email,
+          tokenHash: invitation.tokenHash,
           acceptedAt: null,
           revokedAt: null,
           expiresAt: { gt: acceptedAt },
