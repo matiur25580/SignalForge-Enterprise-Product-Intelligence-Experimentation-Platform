@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { authenticateIngestionKey } from "@/lib/ingestion-auth";
 import { INGESTION_LIMITS, reserveIngestionQuota } from "@/lib/ingestion-rate-limit";
+import { getPlanIngestionLimits } from "@/lib/subscription-plans";
 
 export const runtime = "nodejs";
 
@@ -27,9 +28,9 @@ type RateLimitState = {
   remainingEvents: number;
 };
 
-function rateLimitHeaders(state: RateLimitState, resetAt: Date) {
+function rateLimitHeaders(state: RateLimitState, resetAt: Date, limits: typeof INGESTION_LIMITS) {
   return {
-    "X-RateLimit-Limit": String(INGESTION_LIMITS.requestsPerMinute),
+    "X-RateLimit-Limit": String(limits.requestsPerMinute),
     "X-RateLimit-Remaining": String(state.remainingRequests),
     "X-RateLimit-Remaining-Events": String(state.remainingEvents),
     "X-RateLimit-Reset": String(Math.ceil(resetAt.getTime() / 1000)),
@@ -64,6 +65,7 @@ export async function POST(request: Request) {
     }
 
     const { apiKey } = authentication;
+    const limits = getPlanIngestionLimits(apiKey.organization.plan);
     if (apiKey.projectId && apiKey.projectId !== parsed.data.projectId) {
       return Response.json({ error: "API key is not authorized for this project" }, { status: 403 });
     }
@@ -91,6 +93,7 @@ export async function POST(request: Request) {
         apiKey.id,
         parsed.data.events.length,
         receivedAt,
+        limits,
       );
 
       if (!quota) {
@@ -127,15 +130,15 @@ export async function POST(request: Request) {
           error: "Ingestion rate limit exceeded",
           retryAfterSeconds,
           limits: {
-            requestsPerMinute: INGESTION_LIMITS.requestsPerMinute,
-            eventsPerMinute: INGESTION_LIMITS.eventsPerMinute,
+            requestsPerMinute: limits.requestsPerMinute,
+            eventsPerMinute: limits.eventsPerMinute,
           },
         },
         {
           status: 429,
           headers: {
             "Retry-After": String(retryAfterSeconds),
-            ...rateLimitHeaders({ remainingRequests: 0, remainingEvents: 0 }, resetAt),
+            ...rateLimitHeaders({ remainingRequests: 0, remainingEvents: 0 }, resetAt, limits),
           },
         },
       );
@@ -146,7 +149,7 @@ export async function POST(request: Request) {
       duplicates: parsed.data.events.length - result.inserted.count,
     }, {
       status: 202,
-      headers: rateLimitHeaders(result.quota, resetAt),
+      headers: rateLimitHeaders(result.quota, resetAt, limits),
     });
   } catch {
     return Response.json({ error: "Event ingestion failed" }, { status: 500 });
