@@ -61,7 +61,7 @@ Last updated: 2026-11-21
 - [x] GitHub Actions CI for clean PostgreSQL migration, tests, lint, typecheck, and production build
 - [x] Architecture, security, API, database, usage, team-management, and testing documentation
 - [x] Twelve original conceptual dashboard previews embedded as PNG for GitHub mobile compatibility, with source SVGs retained
-- [x] Automated SVG-to-PNG rendering workflow and deterministic conversion script
+- [x] Automated SVG-to-PNG rendering workflow and deterministic conversion script\n- [x] README dashboard previews switched to absolute raw.githubusercontent.com PNG URLs for mobile/embedded Markdown compatibility\n- [x] Database readiness endpoint and protected Prometheus-compatible aggregate metrics endpoint with route tests
 
 ## Not implemented yet
 
@@ -78,11 +78,11 @@ Last updated: 2026-11-21
 - [ ] Feature flag evaluation and experimentation assignment
 - [ ] Statistical experiment analysis and sample-ratio monitoring
 - [ ] AI analyst, anomaly detection, and evidence-linked recommendations
-- [ ] Production observability, alerting, and integrations
+- [ ] Distributed tracing, request latency/error-rate instrumentation, dashboards, and external alerting integrations
 
 ## Verification
 
-The repository contains 12 original SVG dashboard concepts under `docs/images/`. The README embeds relative PNG previews generated from the 12 source SVGs. `.github/workflows/render-dashboard-previews.yml` regenerates all PNGs whenever a source SVG or renderer changes, and validates that all 12 outputs exist and are non-empty.
+The repository contains 12 original SVG dashboard concepts and 12 generated PNG previews under `docs/images/`. README embeds all 12 previews using absolute `raw.githubusercontent.com` URLs; verify each PNG exists in the main branch if a client still fails to render remote images. `.github/workflows/render-dashboard-previews.yml` regenerates all PNGs whenever a source SVG or renderer changes, and validates that all 12 outputs exist and are non-empty.
 
 The CI workflow verifies clean PostgreSQL migrations, automated tests, lint, TypeScript, and a production build. The PostgreSQL-backed ingestion route integration suite was added after the last recorded passing test run; its result must be confirmed by a new CI run before it is considered verified. Do not treat an in-progress or failed run as a passing verification.
 - dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
