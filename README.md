@@ -4,76 +4,93 @@
 
 SignalForge is an event-driven product analytics and experimentation platform designed to help teams understand user behaviour, measure product outcomes, and make statistically responsible decisions.
 
-> **Build status:** Initial repository scaffold. Features are added incrementally and documented only after implementation and verification.
+> **Build status:** Identity and multi-tenant foundations are implemented in source. Database migration and application checks must be run in a configured local environment before use.
 
-## Product scope
+## Implemented foundations
+
+- Next.js 15 App Router application with TypeScript and Tailwind CSS
+- Auth.js GitHub OAuth with database-backed Prisma sessions
+- PostgreSQL data model for users, organizations, memberships, projects, API-key records, and audit logs
+- Organization creation and membership listing APIs
+- Organization-scoped project listing and creation APIs
+- Server-side membership checks; only owners and admins can create projects
+- Transactional audit events for organization and project creation
+
+## Product roadmap
 
 - Product event ingestion with versioned contracts and idempotency
 - Funnels, journeys, cohorts, retention, and feature adoption analytics
 - Feature flags and controlled rollouts
 - Experiment lifecycle management, sample-ratio checks, and statistical readouts
 - Evidence-linked anomaly explanations and natural-language analysis
-- Multi-tenant access control, audit history, and usage metering
+- Usage metering, integrations, governance, and operational observability
 
-## Architecture direction
+## Architecture principles
 
-The first release uses a TypeScript monorepo and a modular application boundary. The initial web application is Next.js. API, event-ingestion, background-worker, and analytics-storage services will be introduced as separately testable components as the product grows.
-
-Key engineering principles:
-
-- Tenant-scoped authorization at every data boundary
-- Explicit event schemas, validation, and idempotent processing
-- Reproducible experiment assignment and transparent statistical methods
-- No fabricated analytics or unverified performance claims
-- Tests and documentation accompany each implemented capability
+- Tenant identity is derived from the authenticated session, never trusted from request payloads.
+- Operational entities live in PostgreSQL; high-volume event analytics will use a column-oriented analytical store.
+- Event processing will use explicit contracts, stable event IDs, and idempotency.
+- AI explanations will be grounded in validated query results.
+- Features are documented as implemented only after code and checks are verified.
 
 ## Repository layout
 
 ```text
-apps/
-  web/              Next.js product interface
-packages/           Shared contracts, utilities, and UI (added incrementally)
-services/           API, ingestion, and worker services (added incrementally)
-infra/              Local development infrastructure (added incrementally)
-docs/               Architecture decisions, security, and operations
+apps/web/
+  prisma/             PostgreSQL schema
+  src/app/            Next.js routes and UI
+  src/lib/             Database and tenant authorization helpers
+  auth.ts              Auth.js configuration
+docs/                  Architecture, security, and API guides
 ```
 
-## Getting started
+## Local setup
 
-Prerequisites: Node.js 20+ and pnpm.
+Prerequisites: Node.js 20+, pnpm 10+, and PostgreSQL.
+
+1. Copy `.env.example` to `.env`.
+2. Create a PostgreSQL database named `signalforge`.
+3. Create a GitHub OAuth application with callback URL `http://localhost:3000/api/auth/callback/github`.
+4. Set `DATABASE_URL`, `AUTH_SECRET`, `AUTH_GITHUB_ID`, and `AUTH_GITHUB_SECRET` in `.env`.
+5. Install dependencies and generate the Prisma client:
 
 ```bash
 corepack enable
 pnpm install
-pnpm --filter @signalforge/web dev
+pnpm db:generate
+pnpm db:migrate
+pnpm dev
 ```
 
-Open http://localhost:3000.
+Open http://localhost:3000. Visit `/sign-in` to authenticate with GitHub.
 
-## Development
+## Database commands
 
 ```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
+pnpm db:generate   # Generate Prisma Client
+pnpm db:migrate    # Create/apply a development migration
+pnpm db:deploy     # Apply committed migrations in deployment environments
+pnpm db:studio     # Open Prisma Studio
 ```
 
-Some commands become available as their corresponding workspace scripts are added.
+## API overview
 
-## Roadmap
+| Method | Endpoint | Access |
+|---|---|---|
+| GET | `/api/organizations` | Authenticated user |
+| POST | `/api/organizations` | Authenticated user |
+| GET | `/api/organizations/:organizationId/projects` | Organization member |
+| POST | `/api/organizations/:organizationId/projects` | Organization owner/admin |
 
-1. **Foundation:** workspace, Next.js shell, design system, linting, type checking, and CI.
-2. **Identity & tenancy:** organizations, projects, memberships, roles, and audit events.
-3. **Event pipeline:** ingestion contract, validation, idempotency, queue, and analytical storage.
-4. **Product analytics:** event explorer, funnels, journeys, cohorts, and retention.
-5. **Experimentation:** feature flags, allocation, SRM validation, and statistical analysis.
-6. **Intelligence:** anomaly detection and evidence-grounded analyst workflows.
-7. **Enterprise readiness:** integrations, governance, metering, observability, and security testing.
+See [Identity API](docs/IDENTITY.md) and [Security baseline](docs/SECURITY.md).
+
+## Verification status
+
+The source files and configuration have been committed to GitHub. Dependency installation, Prisma migration, lint, typecheck, and production build have not yet been run in a configured environment. Do not treat the current repository state as a verified production deployment.
 
 ## Security
 
-Never commit credentials, private keys, production data, or real customer identifiers. Use environment variables and the provided example configuration when one is introduced.
+Never commit credentials, private keys, production data, or real customer identifiers. Review [docs/SECURITY.md](docs/SECURITY.md) before connecting real users or data.
 
 ## License
 
