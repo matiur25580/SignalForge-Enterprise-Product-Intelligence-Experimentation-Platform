@@ -105,6 +105,7 @@ model Project {
   organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   apiKeys        ApiKey[]
   events         Event[]
+  ingestionRateLimit IngestionRateLimit?
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
 
@@ -166,4 +167,13 @@ model AuditLog {
   @@index([organizationId, createdAt])
   @@index([actorId, createdAt])
   @@index([resourceType, resourceId])
+}
+
+model IngestionRateLimit {
+  apiKeyId     String   @id
+  windowStart  DateTime
+  requestCount Int      @default(0)
+  eventCount   Int      @default(0)
+  updatedAt    DateTime @updatedAt
+  apiKey       ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
 }
