@@ -22,15 +22,15 @@ Last updated: 2026-11-21
 - [x] Atomic per-API-key request and event quotas (120 requests / 10,000 events per minute)
 - [x] Standardized rate-limit response headers and HTTP 429 retry guidance
 - [x] PostgreSQL concurrency integration tests for quota enforcement
-- [x] Initial Prisma migration for the current schema, including the Event model
+- [x] Vitest coverage for API-key authentication, ingestion validation, tenant boundaries, duplicate handling, quota responses, and safe failures
+- [x] Committed PostgreSQL migrations for the control plane, events, and ingestion rate-limit state
 - [x] Event ingestion, API-key, and database migration documentation
 - [x] GitHub Actions CI for Prisma validation, clean-database migration application, automated tests, lint, typecheck, and build
 
 ## Not implemented yet
 
 - [ ] Local application setup and live database/runtime verification
-- [x] Vitest coverage for API-key authentication, ingestion validation, tenant boundaries, duplicate handling, and failure responses
-- [ ] Database-backed end-to-end ingestion tests and live runtime verification
+- [ ] Full database-backed event endpoint end-to-end tests and live runtime verification
 - [ ] Organization invitations and membership administration
 - [ ] API-key rotation workflow, plan-based quota configuration, and usage metering
 - [ ] Product SDK, durable event transport, and idempotent downstream consumers
@@ -42,4 +42,4 @@ Last updated: 2026-11-21
 
 ## Verification
 
-Before the migration-enabled workflow change, CI passed Prisma Client generation, schema validation, lint, typecheck, and production build. GitHub Actions run [44875550711](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44875550711) passed: it provisioned PostgreSQL 16, generated Prisma Client, validated the schema, applied the initial migration with `prisma migrate deploy`, and passed lint, typecheck, and production build. This verifies the migration against a clean ephemeral database, not a production database. GitHub Actions run [44875849725](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44875849725) passed dependency installation, Prisma Client generation, schema validation, clean PostgreSQL migration application, the Vitest suite, lint, typecheck, and production build. Route/authentication orchestration tests mock Prisma; quota concurrency tests execute against the ephemeral PostgreSQL service. Production runtime and production database verification remain outstanding.
+Before the migration-enabled workflow change, CI passed Prisma Client generation, schema validation, lint, typecheck, and production build. GitHub Actions run [44875550711](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44875550711) passed: it provisioned PostgreSQL 16, generated Prisma Client, validated the schema, applied the initial migration with `prisma migrate deploy`, and passed lint, typecheck, and production build. This verifies the migration against a clean ephemeral database, not a production database. GitHub Actions run [44875849725](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44875849725) passed dependency installation, Prisma Client generation, schema validation, clean PostgreSQL migration application, the Vitest suite, lint, typecheck, and production build. Route/authentication orchestration tests mock Prisma; quota concurrency tests execute against the ephemeral PostgreSQL service. The rate-limit milestone's final CI run [44876522503](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44876522503) passed dependency installation, Prisma generation and validation, both committed migrations against clean PostgreSQL 16, all 14 automated tests (including concurrent quota enforcement), lint, typecheck, and production build. Full event-endpoint database E2E and production runtime/database verification remain outstanding.
