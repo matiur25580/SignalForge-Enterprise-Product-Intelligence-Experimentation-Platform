@@ -2,7 +2,7 @@
 
 ## Current state
 
-The repository currently contains a Next.js 15 App Router application in a pnpm workspace. The first commit establishes the product shell and a strict TypeScript baseline. Analytics cards intentionally display empty states; no synthetic business metrics are presented as live data.
+The repository currently contains a Next.js 15 App Router application in a pnpm workspace. The application now includes Auth.js identity, organization and project APIs, scoped API keys, event ingestion, PostgreSQL-backed quota reservation, usage reporting, subscription entitlements, organization invitations, role administration, and audit logging. Analytics cards intentionally display empty states; no synthetic business metrics are presented as live data.
 
 ## Target system boundaries
 
@@ -51,3 +51,18 @@ API Gateway + Tenant Authorization
 - Tests: unit, integration, end-to-end, and load tests
 
 These are target choices, not claims that the services are already implemented.
+
+
+## Implemented control-plane modules
+
+- **Identity:** Auth.js GitHub OAuth and database sessions.
+- **Tenant and access:** organization membership checks and OWNER/ADMIN/MEMBER/VIEWER roles.
+- **Team lifecycle:** email-bound invitations with one-time hashed tokens, seven-day expiry, reissue, acceptance, and revocation; guarded member role changes/removal.
+- **Project registry:** organization-scoped projects and environments.
+- **Credential management:** API key issue/list/revoke, expiration, and hash-only storage.
+- **Ingestion governance:** project-bound authorization, idempotent event writes, atomic per-key quotas, and plan-derived entitlements.
+- **Auditability:** transactional audit events for sensitive organization, project, credential, invitation, and member operations.
+
+## Current persistence boundary
+
+PostgreSQL is the current operational source of truth for the implemented control plane and initial event records. Event analytics at scale, durable streaming, ClickHouse, Redis, background workers, feature flags, and experimentation services remain planned. The modular monolith is deliberate: it keeps transaction boundaries and authorization policy understandable while the domain model matures.
