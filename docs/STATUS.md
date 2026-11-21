@@ -31,7 +31,7 @@ Last updated: 2026-11-21
 - [x] OAuth sign-in abuse protection: 10 attempts per client address and authenticated provider account per 15-minute window, shared PostgreSQL counters, privacy-preserving hashed subject keys, and expired-bucket cleanup
 - [x] OAuth callback URL validation, production Secure cookies, and account-level callback throttling
 - [x] Rate-limit tests for threshold behavior, retry timing, configurable policies, and client-address hashing
-- [x] OAuth account-protection and safe callback URL test coverage\n- [x] Shared configurable PostgreSQL rate limiter for administrative operations\n- [x] Organization creation limit: 3 requests/hour per user and client address\n- [x] Project creation limit: 20 requests/hour per organization, member, and client address\n- [x] Organization/project route tests for HTTP 429, fail-closed storage errors, and successful audited creation
+- [x] OAuth account-protection and safe callback URL test coverage\n- [x] Shared configurable PostgreSQL rate limiter for administrative operations\n- [x] Organization creation limit: 3 requests/hour per user and client address\n- [x] Project creation limit: 20 requests/hour per organization, member, and client address\n- [x] API-key and invitation creation limits: 10 requests/hour per organization member and client address\n- [x] Member role changes/removals limit: 30 requests/hour per organization member and client address\n- [x] Organization/project route tests for HTTP 429, fail-closed storage errors, and successful audited creation
 
 ### Event ingestion and usage
 - [x] Strict, bounded batch event ingestion with project-scoped tenant checks
