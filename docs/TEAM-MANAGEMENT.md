@@ -60,6 +60,34 @@ Requires a signed-in user whose account email matches the invitation email.
 
 Acceptance is single-use and transactional. The endpoint rejects unknown, mismatched, expired, revoked, or already accepted invitations.
 
+## Member administration
+
+### List organization members
+
+`GET /api/organizations/:organizationId/members`
+
+Any organization member can view the directory. The response includes member role, join time, and basic profile fields.
+
+### Change a member role
+
+`PATCH /api/organizations/:organizationId/members/:memberId`
+
+Requires OWNER or ADMIN.
+
+```json
+{
+  "role": "VIEWER"
+}
+```
+
+Only OWNER can grant or revoke ADMIN. ADMIN can manage MEMBER and VIEWER roles only. The OWNER role cannot be changed through this endpoint; ownership transfer requires a dedicated workflow.
+
+### Remove a member
+
+`DELETE /api/organizations/:organizationId/members/:memberId`
+
+OWNER can remove non-owner members. ADMIN can remove MEMBER and VIEWER only. Owner removal is blocked until an explicit ownership-transfer workflow exists. Role changes and removals use conditional writes and transactional audit records.
+
 ## Security properties
 
 - 256-bit random token material generated with Node.js crypto.
