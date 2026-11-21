@@ -38,6 +38,7 @@ describe("authenticateIngestionKey", () => {
       projectId: "project_1",
       expiresAt: null,
       revokedAt: null,
+      organization: { plan: "FREE" },
     };
     findUnique.mockResolvedValue(apiKey);
 
@@ -55,6 +56,7 @@ describe("authenticateIngestionKey", () => {
         projectId: true,
         expiresAt: true,
         revokedAt: true,
+        organization: { select: { plan: true } },
       },
     });
     expect(result).toEqual({ ok: true, apiKey });
