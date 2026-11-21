@@ -63,7 +63,7 @@ describe("POST /api/invitations/accept", () => {
     expect(response.status).toBe(200);
     expect(body).toMatchObject({ success: true, organizationId: "org_1", role: "MEMBER" });
     expect(mocks.updateInvitation).toHaveBeenCalledWith(expect.objectContaining({
-      where: expect.objectContaining({ id: "invite_1", email: "analyst@example.com", acceptedAt: null, revokedAt: null }),
+      where: expect.objectContaining({ id: "invite_1", email: "analyst@example.com", tokenHash: "b".repeat(64), acceptedAt: null, revokedAt: null }),
     }));
     expect(mocks.createMembership).toHaveBeenCalledWith({
       data: { organizationId: "org_1", userId: "user_invited", role: "MEMBER" },
