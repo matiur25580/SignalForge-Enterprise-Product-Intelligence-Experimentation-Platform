@@ -14,6 +14,7 @@ Last updated: 2026-11-21
 - [x] Organization-scoped project listing and creation endpoints
 - [x] Server-side organization membership and role checks
 - [x] Transactional audit events for organization/project creation
+- [x] GitHub Actions CI workflow for Prisma validation, lint, typecheck, and build
 - [x] Environment example and identity/security documentation
 
 ## Not implemented yet
