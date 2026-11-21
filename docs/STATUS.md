@@ -46,7 +46,8 @@ Last updated: 2026-11-21
 - [x] PostgreSQL migrations for core schema, ingestion quotas, subscription plans, and organization invitations
 - [x] GitHub Actions CI for clean PostgreSQL migration, tests, lint, typecheck, and production build
 - [x] Architecture, security, API, database, usage, team-management, and testing documentation
-- [x] Twelve original conceptual dashboard SVG previews in the README (illustrative, not live application pages)
+- [x] Twelve original conceptual dashboard previews embedded as PNG for GitHub mobile compatibility, with source SVGs retained
+- [x] Automated SVG-to-PNG rendering workflow and deterministic conversion script
 
 ## Not implemented yet
 
@@ -67,7 +68,7 @@ Last updated: 2026-11-21
 
 ## Verification
 
-The repository contains 12 original SVG dashboard concepts under `docs/images/`. The README embeds them using absolute `raw.githubusercontent.com` image URLs for consistent rendering across Markdown viewers.
+The repository contains 12 original SVG dashboard concepts under `docs/images/`. The README embeds relative PNG previews generated from the 12 source SVGs. `.github/workflows/render-dashboard-previews.yml` regenerates all PNGs whenever a source SVG or renderer changes, and validates that all 12 outputs exist and are non-empty.
 
 The latest CI run is linked from the repository badge. The workflow verifies clean PostgreSQL migrations, automated tests, lint, TypeScript, and a production build. Do not treat an in-progress or failed run as a passing verification.
 - dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
