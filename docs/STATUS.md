@@ -22,6 +22,7 @@ Last updated: 2026-11-21
 - [x] Invitation tokens stored as SHA-256 hashes and bound to the authenticated account email
 - [x] OWNER/ADMIN role hierarchy for member role changes and member removal
 - [x] Transactional audit records for invitation and membership lifecycle actions
+- [x] Organization activity timeline page and tenant-scoped cursor-paginated audit API
 - [x] Invitation and member-management API tests
 
 ### Event ingestion and usage
