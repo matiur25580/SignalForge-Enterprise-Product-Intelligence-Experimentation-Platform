@@ -33,7 +33,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 |---|---|
 | Identity | Auth.js GitHub OAuth and database-backed sessions |
 | Multi-tenancy | Organizations, memberships, roles, and server-side access checks |
-| Team management | Secure email-bound invitations with optional Resend delivery, member directory, role administration, guarded removal, single-use acceptance, revocation, audit trail, and interactive team UI |
+| Team management | Secure owner-controlled ownership transfer with typed confirmation and atomic role handoff; secure email-bound invitations with optional Resend delivery, member directory, role administration, guarded removal, single-use acceptance, revocation, audit trail, and interactive team UI |
 | Workspace UI | Authenticated organization dashboard, workspace creation, project registry, team administration, and invitation token handling |
 | Projects | Organization-scoped project creation and listing |
 | API credentials | Cryptographically random secrets, SHA-256 hash-only storage, one-time display, expiry, revocation, atomic audited rotation, and interactive organization key console |
@@ -48,7 +48,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 
 ### Team invitations
 
-Organization OWNERs can invite teammates as ADMIN, MEMBER, or VIEWER; ADMINs can invite MEMBER or VIEWER only. Invitation tokens are generated using cryptographically secure randomness, stored only as SHA-256 hashes, expire after seven days, and can be accepted only by a signed-in account with the matching email. Members can be listed, roles can be changed under a strict OWNER/ADMIN hierarchy, and non-owner members can be removed. Acceptance, role changes, revocation, and removal are transactional and audited. When Resend credentials are configured, invitations are emailed with a single-use acceptance link and the raw token is not returned to the inviter. Without email credentials, the API provides a one-time manual acceptance URL. Invitees can open a dedicated acceptance page, sign in with the invited GitHub account, and accept the invitation directly. The page removes the token from the visible URL after hydration and submits it only in the POST body. Configure `RESEND_API_KEY`, `EMAIL_FROM`, and `AUTH_URL` to enable delivery. See [Team management](docs/TEAM-MANAGEMENT.md).
+Organization OWNERs can invite teammates as ADMIN, MEMBER, or VIEWER; ADMINs can invite MEMBER or VIEWER only. Invitation tokens are generated using cryptographically secure randomness, stored only as SHA-256 hashes, expire after seven days, and can be accepted only by a signed-in account with the matching email. Members can be listed, roles can be changed under a strict OWNER/ADMIN hierarchy, and non-owner members can be removed. The current OWNER can transfer ownership to an active organization member using an explicit typed confirmation; the previous owner becomes ADMIN and both role changes plus the audit event commit atomically. Acceptance, role changes, revocation, and removal are transactional and audited. When Resend credentials are configured, invitations are emailed with a single-use acceptance link and the raw token is not returned to the inviter. Without email credentials, the API provides a one-time manual acceptance URL. Invitees can open a dedicated acceptance page, sign in with the invited GitHub account, and accept the invitation directly. The page removes the token from the visible URL after hydration and submits it only in the POST body. Configure `RESEND_API_KEY`, `EMAIL_FROM`, and `AUTH_URL` to enable delivery. See [Team management](docs/TEAM-MANAGEMENT.md).
 
 ### Event ingestion contract
 
@@ -292,6 +292,7 @@ CI success verifies the checks in that workflow; it does not imply that a produc
 - [ ] Usage threshold notifications
 - [x] Invitation email delivery integration and invitee acceptance UI
 - [x] Organization activity timeline with tenant-scoped cursor pagination
+- [x] Secure ownership transfer with atomic role handoff and audit trail
 - [ ] Product SDKs and durable event transport
 - [ ] ClickHouse-backed funnels, journeys, cohorts, and retention
 - [ ] Feature flag evaluation and controlled rollouts
@@ -305,6 +306,7 @@ CI success verifies the checks in that workflow; it does not imply that a produc
 - [Identity and organization APIs](docs/IDENTITY.md)
 - [Team management and invitations](docs/TEAM-MANAGEMENT.md)
 - [Organization activity timeline](docs/ACTIVITY-TIMELINE.md)
+- [Ownership transfer](docs/OWNERSHIP-TRANSFER.md)
 - [Security baseline](docs/SECURITY.md)
 - [API key lifecycle](docs/API-KEYS.md)
 - [Event ingestion contract](docs/EVENT-INGESTION.md)
