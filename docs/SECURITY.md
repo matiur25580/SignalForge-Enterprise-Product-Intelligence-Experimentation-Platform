@@ -16,7 +16,7 @@
 - Organization APIs resolve the authenticated user before accessing tenant data.
 - Membership is queried using the composite organization/user key.
 - Project reads resolve the project's organization and then verify membership.
-- Project creation is restricted to organization owners and administrators.
+- Project creation is restricted to organization owners and administrators.\n- Organization creation is limited to 3 attempts per hour per authenticated user and client address.\n- Project creation is limited to 20 attempts per hour per organization, member, and client address.\n- Administrative creation limits use the same atomic PostgreSQL fixed-window counter table as OAuth protection, with only keyed SHA-256 subject hashes stored.\n- Administrative creation routes fail closed with HTTP 503 when rate-limit storage is unavailable and return HTTP 429 with `Retry-After` when over quota.
 - Organization/project creation and audit events share a database transaction.
 
 ## Data model
@@ -33,7 +33,7 @@
 - Client addresses and provider account identifiers are keyed with SHA-256 and the application auth secret before persistence; raw IP addresses and provider account IDs are not stored in the limiter table.
 - Expired buckets are pruned opportunistically during limiter requests.
 - Requests over the limit receive HTTP 429 with `Retry-After` and rate-limit headers. If the limiter database is unavailable, sign-in initiation fails closed with HTTP 503 or a retry notice rather than silently bypassing protection.
-- The migration creates `AuthRateLimit`; deploy the database migration before running the updated application.
+- The migration creates `AuthRateLimit`; deploy the database migration before running the updated application. This single table backs authentication and administrative operation limits.
 
 ## Active session controls
 
@@ -48,7 +48,7 @@
 
 This is an initial security baseline, not a production security certification. Add:
 - Complete OAuth account-linking threat review (safe callback URL validation and provider account throttling are implemented)
-- Rate limits and abuse controls for authentication and organization creation
+- Configurable per-tenant policies and anomaly alerting for broader administrative/API operations
 - CSRF/origin and deployment-host configuration review
 - Secret rotation and managed secret storage
 - API-key issuance, one-time secret display, hashing, rotation, and revocation workflows
