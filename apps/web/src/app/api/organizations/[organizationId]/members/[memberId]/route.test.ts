@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/auth-rate-limit", () => ({
   clientAddressFromHeaders: () => "203.0.113.10",
-  consumeSharedRateLimit: vi.fn().mockResolvedValue({ allowed: true, limit: 30, remaining: 29, retryAfterSeconds: 0 }),
+  consumeSharedRateLimit: mocks.consumeRateLimit,
   MEMBER_MUTATION_RATE_LIMIT: { windowMs: 3600000, maxAttempts: 30 },
   rateLimitResponse: (retry: number, limit: number) => Response.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(retry), "X-RateLimit-Limit": String(limit) } }),
 }));
@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => ({
   deleteMany: vi.fn(),
   auditCreate: vi.fn(),
   transaction: vi.fn(),
+  consumeRateLimit: vi.fn(),
 }));
 
 vi.mock("@/lib/tenant", () => ({
@@ -43,6 +44,7 @@ function patchRequest(role: string) {
 describe("organization member administration", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.consumeRateLimit.mockResolvedValue({ allowed: true, limit: 30, remaining: 29, retryAfterSeconds: 0 });
     mocks.requireMember.mockResolvedValue({ user: { id: "owner_1" }, membership: { role: "OWNER" } });
     mocks.findFirst.mockResolvedValue({ id: "member_1", userId: "user_2", role: "MEMBER" });
     mocks.updateMany.mockResolvedValue({ count: 1 });
@@ -53,6 +55,14 @@ describe("organization member administration", () => {
       auditLog: { create: mocks.auditCreate },
     };
     mocks.transaction.mockImplementation(async (callback: (transaction: typeof tx) => Promise<unknown>) => callback(tx));
+  });
+
+  it("blocks member mutations after the organization actor quota is exhausted", async () => {
+    mocks.consumeRateLimit.mockResolvedValue({ allowed: false, limit: 30, remaining: 0, retryAfterSeconds: 600 });
+    const response = await PATCH(patchRequest("ADMIN"), context);
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("600");
+    expect(mocks.transaction).not.toHaveBeenCalled();
   });
 
   it("allows an owner to promote a member and audits the change", async () => {
