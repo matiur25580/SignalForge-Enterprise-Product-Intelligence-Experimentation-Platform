@@ -169,6 +169,28 @@ describe("POST /api/v1/events", () => {
     expect(mocks.authenticate).not.toHaveBeenCalled();
   });
 
+  it("rejects event timestamps more than five minutes in the future", async () => {
+    const body = validBatch();
+    const response = await POST(makeRequest({
+      ...body,
+      events: [{ ...body.events[0], timestamp: new Date(Date.now() + 6 * 60 * 1000).toISOString() }],
+    }));
+
+    expect(response.status).toBe(400);
+    expect(mocks.authenticate).not.toHaveBeenCalled();
+  });
+
+  it("allows small clock skew and historical event backfills", async () => {
+    const body = validBatch();
+    const response = await POST(makeRequest({
+      ...body,
+      events: [{ ...body.events[0], timestamp: new Date(Date.now() + 4 * 60 * 1000).toISOString() }],
+    }));
+
+    expect(response.status).toBe(202);
+    expect(mocks.authenticate).toHaveBeenCalledTimes(1);
+  });
+
   it("rejects malformed JSON", async () => {
     const response = await POST(new Request("http://localhost/api/v1/events", {
       method: "POST",
