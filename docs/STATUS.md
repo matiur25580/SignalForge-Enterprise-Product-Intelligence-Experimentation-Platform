@@ -16,6 +16,11 @@ Last updated: 2026-11-21
 - [x] Transactional audit events for organization/project creation
 - [x] GitHub Actions CI workflow for Prisma validation, lint, typecheck, and build
 - [x] Environment example and identity/security documentation
+- [x] Organization API key issuance with cryptographically random secrets
+- [x] Hash-only API key persistence and one-time secret response
+- [x] Organization-scoped API key listing and soft revocation
+- [x] Audit events for API key creation and revocation
+- [x] API key lifecycle documentation
 
 ## Not implemented yet
 
@@ -24,7 +29,7 @@ Last updated: 2026-11-21
 - [ ] Automated lint, typecheck, and production build verification
 - [ ] Automated authentication and tenant-isolation tests
 - [ ] Organization invitations and membership administration
-- [ ] API-key issuance, one-time display, hashing, rotation, and revocation workflows
+- [ ] API-key authentication middleware, rotation workflow, and usage metering
 - [ ] Event ingestion API and SDK
 - [ ] Durable event processing and idempotent consumers
 - [ ] ClickHouse analytics queries
