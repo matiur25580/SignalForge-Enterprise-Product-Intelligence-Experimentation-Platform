@@ -38,7 +38,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 | Projects | Organization-scoped project creation and listing |
 | API credentials | Cryptographically random secrets, SHA-256 hash-only storage, one-time display, expiry, revocation, atomic audited rotation, and interactive organization key console |
 | Event ingestion | Strictly validated batch endpoint, bounded payloads, server-derived environment, and duplicate protection |
-| Rate limiting | Atomic PostgreSQL per-key ingestion quotas plus shared PostgreSQL rate limits for OAuth, organization creation (3/hour per user+IP), and project creation (20/hour per organization+member+IP), with privacy-preserving subject hashes |
+| Rate limiting | Atomic PostgreSQL per-key ingestion quotas plus shared PostgreSQL rate limits for OAuth, organization/project creation, API-key issuance, invitations, and member administration, with privacy-preserving subject hashes |
 | Usage intelligence | Authenticated organization usage report with project and API-key breakdowns, dashboard summaries, and plan entitlement visibility |
 | Plan entitlements | Free, Pro, and Enterprise organization tiers with plan-specific atomic per-key ingestion quotas and a transparent plan comparison page |
 | Billing visibility | Current plan, tier comparison, usage and entitlement overview; payment processing is explicitly disabled |
@@ -79,7 +79,7 @@ Content-Type: application/json
 }
 ```
 
-The endpoint validates the payload, verifies API-key scope and lifecycle state, enforces per-key request/event quotas in PostgreSQL, persists events with project-scoped idempotency, and reports accepted/duplicate counts. OAuth sign-in initiation and authenticated GitHub callback completion are rate-limited across app instances using PostgreSQL fixed-window counters; only keyed SHA-256 digests of IP/account subjects are stored. Organization creation is limited to 3 requests/hour per user and client address; project creation is limited to 20 requests/hour per organization, member, and client address. These administrative creation limits fail closed if shared limiter storage is unavailable. Callback destinations are restricted to safe root-relative paths, and production session cookies are Secure. See [Event ingestion](docs/EVENT-INGESTION.md) and [Security](docs/SECURITY.md).
+The endpoint validates the payload, verifies API-key scope and lifecycle state, enforces per-key request/event quotas in PostgreSQL, persists events with project-scoped idempotency, and reports accepted/duplicate counts. OAuth sign-in initiation and authenticated GitHub callback completion are rate-limited across app instances using PostgreSQL fixed-window counters; only keyed SHA-256 digests of IP/account subjects are stored. Organization creation is limited to 3 requests/hour per user and client address; project creation is limited to 20 requests/hour per organization, member, and client address; API-key creation and invitation creation are each limited to 10 requests/hour per organization member and client address; member role changes/removals are limited to 30 requests/hour per organization member and client address. These administrative creation limits fail closed if shared limiter storage is unavailable. Callback destinations are restricted to safe root-relative paths, and production session cookies are Secure. See [Event ingestion](docs/EVENT-INGESTION.md) and [Security](docs/SECURITY.md).
 
 ### Organization usage reporting
 
