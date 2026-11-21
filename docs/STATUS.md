@@ -26,6 +26,8 @@ Last updated: 2026-11-21
 
 ### Event ingestion and usage
 - [x] Strict, bounded batch event ingestion with project-scoped tenant checks
+- [x] Streaming request-body byte limit enforced before full buffering, with early Content-Length rejection and stream cancellation
+- [x] Invalid UTF-8 request bodies rejected before JSON parsing
 - [x] PostgreSQL event persistence and project/event idempotency
 - [x] Atomic per-API-key request and event quotas
 - [x] Free, Pro, and Enterprise organization plans with plan-specific ingestion entitlements
@@ -60,13 +62,8 @@ Last updated: 2026-11-21
 
 ## Verification
 
-The latest verified GitHub Actions run [44879418883](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44879418883) passed the application UI changes with 39 tests. Invitation email delivery, invitation acceptance UI, and key-rotation updates are awaiting the latest CI run. An earlier invitation email commit failed because of a malformed URL-normalization regex; that syntax issue has been corrected.
-- dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
-- Prisma Client generation and schema validation
-- all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
-- 39 automated tests across 10 test files in the last passing run (the rotation test suite was added afterward)
-- ESLint
-- TypeScript typecheck
-- Next.js production build
+The latest verified baseline before invitation email delivery, invitation acceptance UI, and bounded request-body hardening is [44879418883](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44879418883). It passed clean PostgreSQL 16 migrations, all 39 automated tests, ESLint, TypeScript typecheck, and the Next.js production build.
 
-This validates the repository's CI environment, not production credentials, live OAuth configuration, email delivery, production infrastructure, or a deployed application. No production database migration or deployment has been performed.
+The newer invitation and authentication changes are being validated by the current main-branch workflow. Earlier bounded-body PR attempts passed migrations and the five focused reader tests, but their full runs were blocked by transient issues in the moving main branch (a stale usage-dashboard lint error, then a malformed invitation-route regex). Those issues have since been corrected on main. The rebased PR's fresh CI result must be inspected separately.
+
+CI validates the repository's ephemeral test environment. It does not verify production credentials, live OAuth configuration, email delivery, production infrastructure, or a deployed application. No production database migration or deployment has been performed.
