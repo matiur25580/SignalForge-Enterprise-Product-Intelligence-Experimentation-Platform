@@ -123,8 +123,21 @@ export async function POST(request: Request, { params }: RouteContext) {
         }, { status: 201 });
       }
     } catch {
+      await prisma.$transaction(async (tx) => {
+        await tx.organizationInvitation.updateMany({
+          where: { id: invitation.id, tokenHash: generated.tokenHash, acceptedAt: null, revokedAt: null },
+          data: { revokedAt: new Date() },
+        });
+        await tx.auditLog.create({
+          data: {
+            organizationId, actorId: user.id, action: "organization.invitation.email_delivery_failed",
+            resourceType: "organization_invitation", resourceId: invitation.id,
+            metadata: { email: invitation.email, provider: "resend" },
+          },
+        });
+      });
       return Response.json({
-        error: "Invitation was created but email delivery failed. Resend it after checking the email provider configuration.",
+        error: "Invitation email delivery failed. The invitation was invalidated; correct the email configuration and retry.",
         invitationId: invitation.id,
       }, { status: 502 });
     }
