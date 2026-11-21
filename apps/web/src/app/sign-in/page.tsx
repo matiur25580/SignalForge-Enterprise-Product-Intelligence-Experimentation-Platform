@@ -1,6 +1,18 @@
 import { signIn } from "../../../auth";
 
-export default async function SignInPage({ searchParams }: { searchParams: Promise<{ callbackUrl?: string }> }) {\n  const { callbackUrl } = await searchParams;\n  const redirectTo = callbackUrl?.startsWith("/") && !callbackUrl.startsWith("//") && !callbackUrl.includes("\\\\") ? callbackUrl : "/";
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
+  const { callbackUrl } = await searchParams;
+  const redirectTo =
+    callbackUrl?.startsWith("/") &&
+    !callbackUrl.startsWith("//") &&
+    !callbackUrl.includes("\\\\")
+      ? callbackUrl
+      : "/";
+
   return (
     <main className="grid min-h-screen place-items-center px-6">
       <section className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-8">
