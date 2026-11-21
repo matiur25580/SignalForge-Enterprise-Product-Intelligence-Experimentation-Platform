@@ -46,7 +46,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 
 ### Team invitations
 
-Organization OWNERs and ADMINs can invite teammates as ADMIN, MEMBER, or VIEWER. Invitation tokens are generated using cryptographically secure randomness, stored only as SHA-256 hashes, expire after seven days, and can be accepted only by a signed-in account with the matching email. Members can be listed, roles can be changed under a strict OWNER/ADMIN hierarchy, and non-owner members can be removed. Acceptance, role changes, revocation, and removal are transactional and audited. The API returns the invitation token once; automatic email delivery and the invitation UI are not implemented yet. See [Team management](docs/TEAM-MANAGEMENT.md).
+Organization OWNERs can invite teammates as ADMIN, MEMBER, or VIEWER; ADMINs can invite MEMBER or VIEWER only. Invitation tokens are generated using cryptographically secure randomness, stored only as SHA-256 hashes, expire after seven days, and can be accepted only by a signed-in account with the matching email. Members can be listed, roles can be changed under a strict OWNER/ADMIN hierarchy, and non-owner members can be removed. Acceptance, role changes, revocation, and removal are transactional and audited. The API returns the invitation token once; automatic email delivery and the invitation UI are not implemented yet. See [Team management](docs/TEAM-MANAGEMENT.md).
 
 ### Event ingestion contract
 
