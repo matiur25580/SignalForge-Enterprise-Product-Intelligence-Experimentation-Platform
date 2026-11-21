@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { recordHttpRequest, renderHttpMetrics, resetHttpMetricsForTests } from "@/lib/observability-runtime";
+import { normalizeHttpRoute, recordHttpRequest, renderHttpMetrics, resetHttpMetricsForTests } from "@/lib/observability-runtime";
 
 describe("HTTP operational metrics", () => {
   afterEach(() => resetHttpMetricsForTests());
@@ -14,6 +14,10 @@ describe("HTTP operational metrics", () => {
     expect(output).toContain('le="+Inf"');
     expect(output).toContain("signalforge_http_request_duration_seconds_sum");
     expect(output).toContain("signalforge_http_request_errors_total{method=\"POST\",route=\"/api/v1/events\",status_class=\"5xx\"} 1");
+  });
+
+  it("redacts email addresses and opaque token-like path segments", () => {
+    expect(normalizeHttpRoute("/invite/user@example.com/AbCdEf012345678901234567890123")).toBe("/invite/:id/:id");
   });
 
   it("escapes label values before exposing Prometheus text", () => {
