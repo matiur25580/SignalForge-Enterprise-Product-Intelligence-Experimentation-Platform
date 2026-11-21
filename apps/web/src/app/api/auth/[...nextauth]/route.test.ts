@@ -50,7 +50,7 @@ describe("Auth.js sign-in route protection", () => {
 
   it("fails closed when the shared limiter is unavailable", async () => {
     mocks.consume.mockRejectedValue(new Error("database unavailable"));
-    const response = await POST(new Request("https://example.test/api/auth/signin/github", { method: "POST" }));
+    const response = await POST(new NextRequest("https://example.test/api/auth/signin/github", { method: "POST" }));
     expect(response.status).toBe(503);
     expect(mocks.post).not.toHaveBeenCalled();
   });
