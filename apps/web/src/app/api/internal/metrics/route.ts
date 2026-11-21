@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 function authorized(request: Request) {
   const expected = process.env.OBSERVABILITY_TOKEN;
-  const supplied = request.headers.get("authorization")?.replace(/^Bearer\\s+/i, "");
+  const supplied = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   if (!expected || expected.length < 32 || !supplied) return false;
   const left = Buffer.from(expected);
   const right = Buffer.from(supplied);
@@ -14,12 +14,12 @@ function authorized(request: Request) {
 }
 
 function metric(name: string, help: string, value: number) {
-  return `# HELP signalforge_${name} ${help}\\n# TYPE signalforge_${name} gauge\\nsignalforge_${name} ${value}\\n`;
+  return `# HELP signalforge_${name} ${help}\n# TYPE signalforge_${name} gauge\nsignalforge_${name} ${value}\n`;
 }
 
 export async function GET(request: Request) {
   if (!authorized(request)) {
-    return new Response("Unauthorized\\n", {
+    return new Response("Unauthorized\n", {
       status: 401,
       headers: { "Cache-Control": "no-store", "WWW-Authenticate": "Bearer", "Content-Type": "text/plain; charset=utf-8" },
     });
@@ -45,7 +45,7 @@ export async function GET(request: Request) {
       headers: { "Cache-Control": "no-store", "Content-Type": "text/plain; version=0.0.4; charset=utf-8" },
     });
   } catch {
-    return new Response("Metrics temporarily unavailable\\n", {
+    return new Response("Metrics temporarily unavailable\n", {
       status: 503,
       headers: { "Cache-Control": "no-store", "Content-Type": "text/plain; charset=utf-8" },
     });
