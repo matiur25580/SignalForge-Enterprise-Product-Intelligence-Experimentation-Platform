@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { apiError, requireOrganizationMember } from "@/lib/tenant";
+import { clientAddressFromHeaders, consumeSharedRateLimit, PROJECT_CREATE_RATE_LIMIT, rateLimitResponse } from "@/lib/auth-rate-limit";
 
 const createProjectSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -30,6 +31,16 @@ export async function POST(request: Request, { params }: RouteContext) {
   try {
     const { organizationId } = await params;
     const { user } = await requireOrganizationMember(organizationId, ["OWNER", "ADMIN"]);
+    let limit;
+    try {
+      limit = await consumeSharedRateLimit(
+        `project:create:${organizationId}:${user.id}:ip:${clientAddressFromHeaders(request.headers)}`,
+        PROJECT_CREATE_RATE_LIMIT,
+      );
+    } catch {
+      return Response.json({ error: "Project creation is temporarily unavailable" }, { status: 503 });
+    }
+    if (!limit.allowed) return rateLimitResponse(limit.retryAfterSeconds, limit.limit);
     const input = createProjectSchema.parse(await request.json());
     const project = await prisma.$transaction(async (tx) => {
       const created = await tx.project.create({
