@@ -30,7 +30,7 @@ export default async function OrganizationActivityPage({ params }: Props) {
     <main className="mx-auto min-h-screen max-w-5xl px-6 py-8 md:px-10">
       <header className="mb-10 flex flex-wrap items-center justify-between gap-4 border-b border-[var(--border)] pb-6">
         <Link href="/" className="text-sm font-extrabold tracking-[.18em]">SIGNALFORGE</Link>
-        <Link href={`/organizations/${organizationId}/team`} className="action-secondary">← Team & access</Link>
+        <div className="flex gap-2"><Link href={`/organizations/${organizationId}/security`} className="action-secondary">Security alerts</Link><Link href={`/organizations/${organizationId}/team`} className="action-secondary">← Team & access</Link></div>
       </header>
       <div className="mb-8"><p className="eyebrow">Workspace / {membership.organization.slug} / Governance</p><h1 className="mt-3 text-4xl font-extrabold tracking-tight">Activity timeline</h1><p className="mt-3 text-sm muted">{membership.organization.name} · Recent administrative and security events</p></div>
       <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6">
