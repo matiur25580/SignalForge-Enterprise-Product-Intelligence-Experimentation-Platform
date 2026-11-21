@@ -34,17 +34,17 @@ describe("organization security alerts API", () => {
   it("does not resolve an alert outside the organization", async () => {
     mocks.updateMany.mockResolvedValue({ count: 0 });
     const response = await POST(new Request("http://localhost/api/organizations/org_alpha/security-alerts", {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ alertId: "clxxxxxxxxxxxxxxx000000001" }),
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ alertId: "c123456789012345678901234" }),
     }), context);
     expect(response.status).toBe(404);
     expect(mocks.updateMany).toHaveBeenCalledWith(expect.objectContaining({
-      where: { id: "clxxxxxxxxxxxxxxx000000001", organizationId: "org_alpha", status: "OPEN" },
+      where: { id: "c123456789012345678901234", organizationId: "org_alpha", status: "OPEN" },
     }));
   });
 
   it("resolves only an open alert in the selected organization", async () => {
     const response = await POST(new Request("http://localhost/api/organizations/org_alpha/security-alerts", {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ alertId: "clxxxxxxxxxxxxxxx000000001" }),
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ alertId: "c123456789012345678901234" }),
     }), context);
     expect(response.status).toBe(200);
     expect((await response.json()).status).toBe("RESOLVED");
