@@ -249,4 +249,5 @@ model SecurityAlert {
 
   @@unique([organizationId, fingerprint])
   @@index([organizationId, status, severity, lastSeenAt])
+  @@index([status, lastNotifiedAt])
 }
