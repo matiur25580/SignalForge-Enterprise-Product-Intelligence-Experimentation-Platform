@@ -85,3 +85,9 @@ This is an initial security baseline, not a production security certification. A
 - Node instrumentation records HTTP method, normalized route, response status, and duration. Route identifiers are normalized to `:id` to reduce label cardinality.
 - Sampled server spans can be exported as OTLP/HTTP JSON to `OTEL_EXPORTER_OTLP_ENDPOINT`; optional collector headers are configured with `OTEL_EXPORTER_OTLP_HEADERS`. Protect collector endpoints and credentials, and use HTTPS outside trusted private networks.
 - Prometheus HTTP counters and latency histograms are in-process metrics. They reset on process restart and are not shared across serverless instances; use a scraper/collector that handles per-instance series and aggregation. The metrics endpoint remains protected by `OBSERVABILITY_TOKEN`.
+
+## Security alert notification delivery
+
+- The scheduled security monitor atomically claims eligible high/critical alerts before contacting email or Slack providers, so overlapping monitor runs do not send the same claimed alerts concurrently.
+- Claims older than five minutes are eligible for recovery after a crashed monitor run. Failed or unconfigured delivery releases the claim; successful delivery records the cooldown timestamp and clears the claim.
+- Provider delivery remains at-least-once across ambiguous network failures or partial multi-provider success. Use provider-side idempotency where available before treating notifications as exactly-once.
