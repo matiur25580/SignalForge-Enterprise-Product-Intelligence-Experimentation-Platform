@@ -31,6 +31,9 @@ Last updated: 2026-11-21
 - [x] Free, Pro, and Enterprise organization plans with plan-specific ingestion entitlements
 - [x] Public `GET /api/plans` catalog endpoint
 - [x] Authenticated organization usage reporting with bounded date ranges and project/API-key breakdowns
+- [x] Interactive organization API-key console with scoped creation, one-time secret display, metadata listing, and revocation
+- [x] Organization usage dashboard with event breakdowns and current plan entitlement visibility
+- [x] Read-only plan comparison and billing overview with explicit payment-processing limitations
 - [x] PostgreSQL concurrency tests for quota enforcement
 
 ### Quality and documentation
@@ -45,7 +48,7 @@ Last updated: 2026-11-21
 - [ ] Automatic invitation email delivery and invitee invitation acceptance UI
 - [ ] Ownership transfer and owner lifecycle workflows
 - [ ] Local application setup and production runtime/database verification
-- [ ] API-key rotation and self-service key lifecycle policies
+- [ ] Atomic one-click API-key rotation endpoint and self-service key lifecycle policies
 - [ ] Payment-backed subscription lifecycle, checkout, invoices, and billing
 - [ ] Product SDKs, durable event transport, and downstream consumers
 - [ ] ClickHouse-backed analytical queries
@@ -57,7 +60,7 @@ Last updated: 2026-11-21
 
 ## Verification
 
-The latest GitHub Actions run [44878888794](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44878888794) passed after the workspace UI changes. It completed clean PostgreSQL 16 migrations, all 39 automated tests, ESLint, TypeScript typecheck, and the Next.js production build.
+The latest verified baseline before the API-key and usage UI changes is GitHub Actions run [44878888794](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44878888794), which passed clean PostgreSQL 16 migrations, all 39 automated tests, ESLint, TypeScript typecheck, and the Next.js production build. The new UI changes are awaiting their own CI run.
 - dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
 - Prisma Client generation and schema validation
 - all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
