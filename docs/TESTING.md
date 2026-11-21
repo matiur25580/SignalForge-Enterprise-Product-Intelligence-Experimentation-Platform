@@ -27,8 +27,10 @@ The current suite covers:
 - Request body size limits
 - Generic persistence error responses that do not expose database details
 - Atomic quota enforcement under concurrent PostgreSQL transactions
+- PostgreSQL-backed event route integration tests for active, revoked, and expired API keys
+- Cross-organization project isolation, duplicate idempotency, persisted event scope, and invalid payload rejection
 - Event-volume quota rejection without consuming additional capacity
 
-Prisma calls are mocked at the route boundary. These tests validate request/authentication orchestration and persistence intent, but they are not substitutes for end-to-end tests against a running application and a real database.
+The route-handler unit tests mock Prisma at the boundary and validate request/authentication orchestration. A separate `route.integration.test.ts` suite exercises the actual route, hashed API-key lookup, API-key expiry and revocation, organization/project isolation, event persistence, server-derived environment, duplicate handling, and invalid payload rejection against PostgreSQL. These database-backed tests run in CI after migrations and are not a substitute for verification against a deployed production environment.
 
 GitHub Actions runs this suite after applying migrations to its ephemeral PostgreSQL 16 service, including real database concurrency checks, then continues with lint, typecheck, and production build.
