@@ -6,7 +6,7 @@ export function normalizeHttpRoute(pathname: string) {
   return pathname
     .split("/")
     .map((segment) => {
-      if (/^\d+$/.test(segment) || /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(segment) || /^c[a-z0-9]{20,}$/i.test(segment)) {
+      if (/^\d+$/.test(segment) || /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(segment) || /^c[a-z0-9]{20,}$/i.test(segment) || /^[^/]+@[^/]+\.[^/]+$/.test(segment) || /^[A-Za-z0-9_-]{24,}$/.test(segment)) {
         return ":id";
       }
       return segment;
