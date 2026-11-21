@@ -4,8 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { reserveIngestionQuota } from "@/lib/ingestion-rate-limit";
 
 describe("reserveIngestionQuota (PostgreSQL integration)", () => {
-  let organizationId: string;
-  let apiKeyId: string;
+  let organizationId = "";
+  let apiKeyId = "";
 
   beforeAll(async () => {
     const organization = await prisma.organization.create({
