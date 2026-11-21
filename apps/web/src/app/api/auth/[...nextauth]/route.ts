@@ -1,4 +1,5 @@
 import { handlers } from "../../../../../auth";
+import type { NextRequest } from "next/server";
 import { clientAddressFromHeaders, consumeAuthRateLimit } from "@/lib/auth-rate-limit";
 
 async function guardSignIn(request: Request) {
@@ -26,12 +27,12 @@ async function guardSignIn(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const blocked = await guardSignIn(request);
   return blocked ?? handlers.GET(request);
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const blocked = await guardSignIn(request);
   return blocked ?? handlers.POST(request);
 }
