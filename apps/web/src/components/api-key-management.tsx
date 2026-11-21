@@ -69,6 +69,20 @@ export function ApiKeyManagement({ organizationId, canManage }: { organizationId
     setNotice("API key secret copied to clipboard.");
   }
 
+  async function rotate(key: ApiKey) {
+    if (!window.confirm(`Rotate ${key.name}? The existing key will be revoked immediately. Update your integration with the new secret before continuing.`)) return;
+    setBusy(true); setError(""); setNotice(""); setSecret("");
+    try {
+      const response = await fetch(`/api/organizations/${organizationId}/api-keys/${key.id}`, { method: "POST" });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "Could not rotate API key");
+      setSecret((body.apiKey as CreatedKey).secret);
+      setNotice("Key rotated. The previous credential is revoked; copy and deploy the replacement secret now.");
+      await load();
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not rotate API key"); }
+    finally { setBusy(false); }
+  }
+
   return <div className="space-y-8">
     {error ? <p role="alert" className="rounded-xl border border-rose-400/30 bg-rose-400/10 p-4 text-sm text-rose-200">{error}</p> : null}
     {notice ? <p role="status" className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-200">{notice}</p> : null}
@@ -80,7 +94,7 @@ export function ApiKeyManagement({ organizationId, canManage }: { organizationId
       <div className="flex items-end"><button className="action-primary w-full" disabled={busy}>{busy ? "Creating…" : "Generate secure key"}</button></div>
     </form><p className="mt-3 text-xs muted">Only OWNER and ADMIN roles can create or revoke keys. Use project-scoped credentials for production integrations.</p></section> : null}
     <section className="panel overflow-hidden"><div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] p-6"><div><p className="eyebrow">Credential inventory</p><h2 className="mt-2 text-xl font-bold">API keys</h2></div><span className="text-xs muted">{keys.filter(k => !k.revokedAt).length} active · {keys.length} total</span></div>
-      {loading ? <p className="p-6 text-sm muted">Loading credentials…</p> : keys.length ? <div className="divide-y divide-[var(--border)]">{keys.map((key) => <article key={key.id} className="flex flex-wrap items-center justify-between gap-4 p-5"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h3 className="font-bold">{key.name}</h3><span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${key.revokedAt ? "bg-rose-400/10 text-rose-300" : key.expiresAt && new Date(key.expiresAt) < new Date() ? "bg-amber-400/10 text-amber-300" : "bg-emerald-400/10 text-emerald-300"}`}>{key.revokedAt ? "REVOKED" : key.expiresAt && new Date(key.expiresAt) < new Date() ? "EXPIRED" : "ACTIVE"}</span></div><p className="mt-1 font-mono text-xs muted">{key.keyPrefix}••••••••</p><p className="mt-2 text-xs muted">{key.projectId ? `Project: ${projects.find(p => p.id === key.projectId)?.name ?? "Scoped project"}` : "Organization-wide"} · Created {new Date(key.createdAt).toLocaleDateString()} · {key.lastUsedAt ? `Last used ${new Date(key.lastUsedAt).toLocaleString()}` : "Never used"}{key.expiresAt ? ` · Expires ${new Date(key.expiresAt).toLocaleDateString()}` : " · No expiry"}</p></div>{canManage && !key.revokedAt ? <button className="action-danger" disabled={busy} onClick={() => void revoke(key)}>Revoke key</button> : null}</article>)}</div> : <p className="p-8 text-center text-sm muted">No API keys yet. Create a project-scoped credential to start sending events.</p>}
+      {loading ? <p className="p-6 text-sm muted">Loading credentials…</p> : keys.length ? <div className="divide-y divide-[var(--border)]">{keys.map((key) => <article key={key.id} className="flex flex-wrap items-center justify-between gap-4 p-5"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h3 className="font-bold">{key.name}</h3><span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${key.revokedAt ? "bg-rose-400/10 text-rose-300" : key.expiresAt && new Date(key.expiresAt) < new Date() ? "bg-amber-400/10 text-amber-300" : "bg-emerald-400/10 text-emerald-300"}`}>{key.revokedAt ? "REVOKED" : key.expiresAt && new Date(key.expiresAt) < new Date() ? "EXPIRED" : "ACTIVE"}</span></div><p className="mt-1 font-mono text-xs muted">{key.keyPrefix}••••••••</p><p className="mt-2 text-xs muted">{key.projectId ? `Project: ${projects.find(p => p.id === key.projectId)?.name ?? "Scoped project"}` : "Organization-wide"} · Created {new Date(key.createdAt).toLocaleDateString()} · {key.lastUsedAt ? `Last used ${new Date(key.lastUsedAt).toLocaleString()}` : "Never used"}{key.expiresAt ? ` · Expires ${new Date(key.expiresAt).toLocaleDateString()}` : " · No expiry"}</p></div>{canManage && !key.revokedAt ? <div className="flex flex-wrap gap-2"><button className="action-secondary" disabled={busy || Boolean(key.expiresAt && new Date(key.expiresAt) <= new Date())} onClick={() => void rotate(key)}>Rotate key</button><button className="action-danger" disabled={busy} onClick={() => void revoke(key)}>Revoke key</button></div> : null}</article>)}</div> : <p className="p-8 text-center text-sm muted">No API keys yet. Create a project-scoped credential to start sending events.</p>}
     </section>
   </div>;
 }
