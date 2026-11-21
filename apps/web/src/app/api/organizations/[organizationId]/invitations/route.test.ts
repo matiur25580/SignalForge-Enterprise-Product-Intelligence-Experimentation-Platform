@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/auth-rate-limit", () => ({
   clientAddressFromHeaders: () => "203.0.113.10",
-  consumeSharedRateLimit: vi.fn().mockResolvedValue({ allowed: true, limit: 10, remaining: 9, retryAfterSeconds: 0 }),
+  consumeSharedRateLimit: mocks.consumeRateLimit,
   INVITATION_CREATE_RATE_LIMIT: { windowMs: 3600000, maxAttempts: 10 },
   rateLimitResponse: (retry: number, limit: number) => Response.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(retry), "X-RateLimit-Limit": String(limit) } }),
 }));
@@ -19,6 +19,7 @@ const mocks = vi.hoisted(() => ({
   transaction: vi.fn(),
   sendEmail: vi.fn(),
   updateManyInvitation: vi.fn(),
+  consumeRateLimit: vi.fn(),
 }));
 
 vi.mock("@/lib/tenant", () => ({
@@ -59,6 +60,7 @@ function request(body: unknown) {
 describe("organization invitation collection", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.consumeRateLimit.mockResolvedValue({ allowed: true, limit: 10, remaining: 9, retryAfterSeconds: 0 });
     mocks.requireMember.mockResolvedValue({ user: { id: "user_owner" }, membership: { role: "OWNER" } });
     mocks.findFirstMember.mockResolvedValue(null);
     mocks.findOrganization.mockResolvedValue({ name: "SignalForge Test" });
@@ -94,6 +96,14 @@ describe("organization invitation collection", () => {
     expect(response.status).toBe(200);
     expect(body.invitations[0].status).toBe("PENDING");
     expect(body.invitations[0]).not.toHaveProperty("tokenHash");
+  });
+
+  it("returns 429 and does not create an invitation when the invitation quota is exhausted", async () => {
+    mocks.consumeRateLimit.mockResolvedValue({ allowed: false, limit: 10, remaining: 0, retryAfterSeconds: 1200 });
+    const response = await POST(request({ email: "analyst@example.com" }), params);
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("1200");
+    expect(mocks.transaction).not.toHaveBeenCalled();
   });
 
   it("creates a normalized invitation and returns its secret exactly once", async () => {
