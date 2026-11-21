@@ -47,8 +47,11 @@ export async function GET(_request: Request, { params }: RouteContext) {
 export async function POST(request: Request, { params }: RouteContext) {
   try {
     const { organizationId } = await params;
-    const { user } = await requireOrganizationMember(organizationId, ["OWNER", "ADMIN"]);
+    const { user, membership: actor } = await requireOrganizationMember(organizationId, ["OWNER", "ADMIN"]);
     const input = createInvitationSchema.parse(await request.json());
+    if (actor.role !== "OWNER" && input.role === "ADMIN") {
+      return Response.json({ error: "Only an owner can invite another administrator" }, { status: 403 });
+    }
 
     const existingMember = await prisma.organizationMember.findFirst({
       where: { organizationId, user: { email: { equals: input.email, mode: "insensitive" } } },
