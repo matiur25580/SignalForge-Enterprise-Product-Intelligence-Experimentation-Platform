@@ -119,7 +119,7 @@ flowchart LR
 
 ## Dashboard concepts
 
-The following 12 screens illustrate the intended product experience and information architecture. They are original SVG design previews, presented in a **single vertical column** for easy review. The previews use GitHub's HTML image renderer with direct-open links so each design can still be opened if a Markdown client does not render inline SVG. All figures, activity rows, and chart values are illustrative; these screens are not wired to live product data.
+The following 12 screens illustrate the intended product experience and information architecture. They are original dashboard designs rendered as **PNG previews** from the source SVG files, presented in a **single vertical column** for reliable rendering in GitHub's web and mobile Markdown viewers. Source SVGs are retained alongside the PNGs. All figures, activity rows, and chart values are illustrative; these screens are not wired to live product data.
 
 ### 01 · Executive overview
 A high-level workspace snapshot for activation, engagement, conversion, and overall product health.
