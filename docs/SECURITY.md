@@ -69,4 +69,11 @@ This is an initial security baseline, not a production security certification. A
 - Tenant-isolation integration tests and authorization matrix tests
 - Audit-log access controls and retention policy
 - Database backup, restore, and migration rollback procedures
-\n\n## Observability endpoints\n\n- `GET /api/health` exposes only application readiness and database connectivity status; responses are non-cacheable and contain no connection details.\n- `GET /api/internal/metrics` requires `Authorization: Bearer <OBSERVABILITY_TOKEN>`. The token must be at least 32 characters and is compared using constant-time equality.\n- Metrics are aggregate operational counts only (organizations, projects, events, active API keys, open security alerts); no tenant identifiers, user identifiers, secrets, or event properties are exposed.\n- Configure a high-entropy `OBSERVABILITY_TOKEN` in the application environment and restrict scraper access to trusted monitoring infrastructure over HTTPS.\n
+
+
+## Observability endpoints
+
+- `GET /api/health` exposes only application readiness and database connectivity status; responses are non-cacheable and contain no connection details.
+- `GET /api/internal/metrics` requires `Authorization: Bearer <OBSERVABILITY_TOKEN>`. The token must be at least 32 characters and is compared using constant-time equality.
+- Metrics are aggregate operational counts only (organizations, projects, events, active API keys, open security alerts); no tenant identifiers, user identifiers, secrets, or event properties are exposed.
+- Configure a high-entropy `OBSERVABILITY_TOKEN` in the application environment and restrict scraper access to trusted monitoring infrastructure over HTTPS.
