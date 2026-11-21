@@ -1,0 +1,15 @@
+{
+  "name": "signalforge",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "dev": "pnpm --filter @signalforge/web dev",
+    "build": "pnpm --filter @signalforge/web build",
+    "lint": "pnpm --filter @signalforge/web lint",
+    "typecheck": "pnpm --filter @signalforge/web typecheck"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
