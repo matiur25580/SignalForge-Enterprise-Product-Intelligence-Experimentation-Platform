@@ -9,7 +9,7 @@ Last updated: 2026-11-21
 - [x] Strict TypeScript and Tailwind configuration
 - [x] Initial dashboard shell with honest empty states
 - [x] PostgreSQL Prisma schema, shared client, and committed migration history
-- [x] Auth.js GitHub OAuth and database-backed sessions
+- [x] Auth.js GitHub OAuth and database-backed sessions with PostgreSQL-backed rate limits on sign-in initiation
 - [x] Account security page with private active-session inventory and remote revocation of other sessions
 - [x] Organization creation, memberships, roles, and server-side tenant authorization
 - [x] Organization-scoped project creation and listing
@@ -27,7 +27,9 @@ Last updated: 2026-11-21
 - [x] Transactional audit records for invitation and membership lifecycle actions
 - [x] Organization activity timeline page and tenant-scoped cursor-paginated audit API
 - [x] Invitation and member-management API tests
-- [ ] Active-session API tests and full session lifecycle verification
+- [x] Active-session API tests and session revocation safeguards
+- [x] OAuth sign-in abuse protection: 10 attempts per client address per 15-minute window, shared PostgreSQL counters, and privacy-preserving hashed client keys
+- [x] Rate-limit tests for threshold behavior, retry timing, and client-address hashing
 
 ### Event ingestion and usage
 - [x] Strict, bounded batch event ingestion with project-scoped tenant checks
@@ -43,7 +45,7 @@ Last updated: 2026-11-21
 
 ### Quality and documentation
 - [x] Vitest unit, route, and PostgreSQL integration test suites
-- [x] PostgreSQL migrations for core schema, ingestion quotas, subscription plans, and organization invitations
+- [x] PostgreSQL migrations for core schema, ingestion quotas, subscription plans, organization invitations, and authentication rate limits
 - [x] GitHub Actions CI for clean PostgreSQL migration, tests, lint, typecheck, and production build
 - [x] Architecture, security, API, database, usage, team-management, and testing documentation
 - [x] Twelve original conceptual dashboard previews embedded as PNG for GitHub mobile compatibility, with source SVGs retained
