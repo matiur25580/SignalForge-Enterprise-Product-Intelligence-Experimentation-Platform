@@ -37,7 +37,7 @@ export default async function Home() {
           <div className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--accent)] text-lg font-extrabold text-[#091020]">S</div>
           <div><p className="m-0 text-sm font-extrabold tracking-[.18em]">SIGNALFORGE</p><p className="m-0 mt-1 text-xs muted">PRODUCT INTELLIGENCE PLATFORM</p></div>
         </Link>
-        <div className="flex items-center gap-3 text-sm muted"><span>{session.user?.name ?? session.user?.email}</span><Link href="/api/auth/signout" className="action-secondary">Sign out</Link></div>
+        <div className="flex items-center gap-3 text-sm muted"><span>{session.user?.name ?? session.user?.email}</span><Link href="/account/security" className="action-secondary">Account security</Link><Link href="/api/auth/signout" className="action-secondary">Sign out</Link></div>
       </header>
       <section className="mb-8 grid gap-6 lg:grid-cols-[1.4fr_.6fr] lg:items-end">
         <div><p className="eyebrow">Your command center</p><h1 className="mt-3 text-4xl font-extrabold tracking-tight md:text-5xl">Good to see you<span className="text-[var(--mint)]">.</span></h1><p className="mt-4 max-w-2xl leading-7 muted">Manage your organizations, collaborate securely, and build a reliable product intelligence practice.</p></div>
