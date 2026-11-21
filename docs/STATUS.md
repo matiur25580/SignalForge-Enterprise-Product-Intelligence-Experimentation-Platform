@@ -21,12 +21,13 @@ Last updated: 2026-11-21
 - [x] PostgreSQL event storage with project/event idempotency and duplicate reporting
 - [x] Initial Prisma migration for the current schema, including the Event model
 - [x] Event ingestion, API-key, and database migration documentation
-- [x] GitHub Actions CI for Prisma validation, clean-database migration application, lint, typecheck, and build
+- [x] GitHub Actions CI for Prisma validation, clean-database migration application, automated tests, lint, typecheck, and build (test-enabled run pending)
 
 ## Not implemented yet
 
 - [ ] Local application setup and live database/runtime verification
-- [ ] Automated authentication, ingestion, deduplication, and tenant-isolation tests
+- [x] Vitest coverage for API-key authentication, ingestion validation, tenant boundaries, duplicate handling, and failure responses
+- [ ] Database-backed end-to-end ingestion tests and live runtime verification
 - [ ] Organization invitations and membership administration
 - [ ] API-key rotation workflow, rate limiting, quotas, and usage metering
 - [ ] Product SDK, durable event transport, and idempotent downstream consumers
@@ -38,4 +39,4 @@ Last updated: 2026-11-21
 
 ## Verification
 
-Before the migration-enabled workflow change, CI passed Prisma Client generation, schema validation, lint, typecheck, and production build. GitHub Actions run [44875550711](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44875550711) passed: it provisioned PostgreSQL 16, generated Prisma Client, validated the schema, applied the initial migration with `prisma migrate deploy`, and passed lint, typecheck, and production build. This verifies the migration against a clean ephemeral database, not a production database. Live application integration tests and automated ingestion/tenant-isolation tests remain outstanding.
+Before the migration-enabled workflow change, CI passed Prisma Client generation, schema validation, lint, typecheck, and production build. GitHub Actions run [44875550711](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44875550711) passed: it provisioned PostgreSQL 16, generated Prisma Client, validated the schema, applied the initial migration with `prisma migrate deploy`, and passed lint, typecheck, and production build. This verifies the migration against a clean ephemeral database, not a production database. The new Vitest suite is wired into CI; its first test-enabled run is pending. Tests mock Prisma at the route boundary, so live application integration tests and database-backed ingestion verification remain outstanding.
