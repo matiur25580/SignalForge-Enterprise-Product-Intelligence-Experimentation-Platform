@@ -91,8 +91,7 @@ export async function register() {
     const pathname = (request.url || "/").split("?")[0] || "/";
     if (pathname === "/api/internal/metrics") return;
     const trace = parseTraceParent(header(request, "traceparent"));
-    const rate = Number(process.env.OTEL_TRACES_SAMPLE_RATE ?? "0.1");
-    const sampled = Boolean(trace?.sampled) && Math.random() < (Number.isFinite(rate) ? Math.min(1, Math.max(0, rate)) : 0.1);
+    const sampled = Boolean(trace?.sampled);
     active.set(response, {
       startedAt: process.hrtime.bigint(),
       method: request.method || "GET",
