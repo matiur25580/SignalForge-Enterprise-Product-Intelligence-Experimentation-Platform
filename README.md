@@ -4,23 +4,25 @@
 
 SignalForge is an event-driven product analytics and experimentation platform designed to help teams understand user behaviour, measure product outcomes, and make statistically responsible decisions.
 
-> **Build status:** Identity and multi-tenant foundations are implemented in source. Database migration and application checks must be run in a configured local environment before use.
+> **Build status:** Multi-tenant identity, API-key management, and the first PostgreSQL-backed event ingestion path are implemented. The committed database migration is exercised by CI against a clean PostgreSQL service. Full runtime integration tests and production deployment remain outstanding.
 
 ## Implemented foundations
 
 - Next.js 15 App Router application with TypeScript and Tailwind CSS
 - Auth.js GitHub OAuth with database-backed Prisma sessions
-- PostgreSQL data model for users, organizations, memberships, projects, API-key records, and audit logs
+- PostgreSQL data model for users, organizations, memberships, projects, API keys, audit logs, and product events
 - Organization creation and membership listing APIs
 - Organization-scoped project listing and creation APIs
-- Server-side membership checks; only owners and admins can create projects
-- Transactional audit events for organization and project creation
-- GitHub Actions CI workflow for Prisma validation, lint, typecheck, and build
+- Server-side membership checks; only owners and admins can create projects and manage API keys
+- Hash-only API-key storage, one-time secret issuance, expiry and revocation checks
+- Project-scoped batch event ingestion with strict validation and duplicate protection
+- Committed initial PostgreSQL migration and CI migration-apply verification
 
 ## Product roadmap
 
-- Product event ingestion with versioned contracts and idempotency
-- Funnels, journeys, cohorts, retention, and feature adoption analytics
+- Product SDK, rate limiting, quotas, and API-key rotation
+- Durable event transport and processing with Kafka-compatible infrastructure
+- ClickHouse-backed funnels, journeys, cohorts, retention, and feature adoption analytics
 - Feature flags and controlled rollouts
 - Experiment lifecycle management, sample-ratio checks, and statistical readouts
 - Evidence-linked anomaly explanations and natural-language analysis
@@ -30,7 +32,7 @@ SignalForge is an event-driven product analytics and experimentation platform de
 
 - Tenant identity is derived from the authenticated session, never trusted from request payloads.
 - Operational entities live in PostgreSQL; high-volume event analytics will use a column-oriented analytical store.
-- Event processing will use explicit contracts, stable event IDs, and idempotency.
+- Event processing uses explicit contracts, stable event IDs, and idempotency.
 - AI explanations will be grounded in validated query results.
 - Features are documented as implemented only after code and checks are verified.
 
@@ -38,11 +40,11 @@ SignalForge is an event-driven product analytics and experimentation platform de
 
 ```text
 apps/web/
-  prisma/             PostgreSQL schema
+  prisma/             PostgreSQL schema and migrations
   src/app/            Next.js routes and UI
-  src/lib/             Database and tenant authorization helpers
+  src/lib/             Database, API-key, and tenant authorization helpers
   auth.ts              Auth.js configuration
-docs/                  Architecture, security, and API guides
+docs/                  Architecture, security, API, and database guides
 ```
 
 ## Local setup
@@ -53,13 +55,13 @@ Prerequisites: Node.js 20+, pnpm 10+, and PostgreSQL.
 2. Create a PostgreSQL database named `signalforge`.
 3. Create a GitHub OAuth application with callback URL `http://localhost:3000/api/auth/callback/github`.
 4. Set `DATABASE_URL`, `AUTH_SECRET`, `AUTH_GITHUB_ID`, and `AUTH_GITHUB_SECRET` in `.env`.
-5. Install dependencies and generate the Prisma client:
+5. Install dependencies, generate Prisma Client, and apply committed migrations:
 
 ```bash
 corepack enable
 pnpm install
 pnpm db:generate
-pnpm db:migrate
+pnpm db:deploy
 pnpm dev
 ```
 
@@ -70,24 +72,19 @@ Open http://localhost:3000. Visit `/sign-in` to authenticate with GitHub.
 ```bash
 pnpm db:generate   # Generate Prisma Client
 pnpm db:migrate    # Create/apply a development migration
-pnpm db:deploy     # Apply committed migrations in deployment environments
+pnpm db:deploy     # Apply committed migrations
 pnpm db:studio     # Open Prisma Studio
 ```
 
-## API overview
+See [Database migrations](docs/DATABASE.md), [Identity API](docs/IDENTITY.md), [Security baseline](docs/SECURITY.md), [API keys](docs/API-KEYS.md), and [Event ingestion](docs/EVENT-INGESTION.md).
 
-| Method | Endpoint | Access |
-|---|---|---|
-| GET | `/api/organizations` | Authenticated user |
-| POST | `/api/organizations` | Authenticated user |
-| GET | `/api/organizations/:organizationId/projects` | Organization member |
-| POST | `/api/organizations/:organizationId/projects` | Organization owner/admin |
+## Event ingestion
 
-See [Identity API](docs/IDENTITY.md) and [Security baseline](docs/SECURITY.md).
+Send a batch to `POST /api/v1/events` with `Authorization: Bearer sf_live_<secret>`. See [docs/EVENT-INGESTION.md](docs/EVENT-INGESTION.md) for the complete contract, limits, and current limitations.
 
 ## Verification status
 
-The source files and configuration have been committed to GitHub. Dependency installation, Prisma migration, lint, typecheck, and production build have not yet been run in a configured environment. Do not treat the current repository state as a verified production deployment.
+GitHub Actions validates the Prisma schema, applies committed migrations to an ephemeral PostgreSQL 16 service, then runs lint, typecheck, and a production build. Database-backed integration tests and production rollout are separate steps and are not implied by CI success.
 
 ## Security
 
