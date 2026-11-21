@@ -63,6 +63,12 @@ enum OrganizationRole {
   VIEWER
 }
 
+enum SubscriptionPlan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
 enum ProjectEnvironment {
   DEVELOPMENT
   STAGING
@@ -73,6 +79,7 @@ model Organization {
   id          String               @id @default(cuid())
   name        String
   slug        String               @unique
+  plan        SubscriptionPlan     @default(FREE)
   members     OrganizationMember[]
   projects    Project[]
   apiKeys     ApiKey[]
