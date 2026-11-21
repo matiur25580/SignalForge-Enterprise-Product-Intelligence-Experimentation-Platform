@@ -72,6 +72,30 @@ export function TeamManagement({ organizationId, currentRole }: Props) {
     finally { setBusy(false); }
   }
 
+
+  async function transferOwnership(member: Member) {
+    const confirmation = window.prompt(`Transfer workspace ownership to ${member.user.email ?? member.user.name ?? "this member"}? Type TRANSFER OWNERSHIP to confirm. The current owner will become an administrator.`);
+    if (confirmation === null) return;
+    if (confirmation !== "TRANSFER OWNERSHIP") {
+      setError("Ownership transfer cancelled: confirmation text did not match.");
+      return;
+    }
+    setBusy(true); setError(""); setNotice("");
+    try {
+      const response = await fetch(`/api/organizations/${organizationId}/ownership-transfer`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ targetMemberId: member.id, confirmation }),
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "Ownership transfer failed");
+      setNotice("Ownership transferred. Your role is now ADMIN.");
+      window.location.reload();
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Ownership transfer failed");
+    } finally { setBusy(false); }
+  }
+
   async function revoke(invitationId: string) {
     setBusy(true); setError(""); setNotice("");
     try {
@@ -98,7 +122,7 @@ export function TeamManagement({ organizationId, currentRole }: Props) {
 
       <section className="panel overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border)] p-6"><div><p className="eyebrow">Access control</p><h2 className="mt-2 text-xl font-bold">Organization members</h2></div><span className="text-xs muted">{members.length} members</span></div>
-        {loading ? <p className="p-6 text-sm muted">Loading organization team…</p> : members.length ? <div className="divide-y divide-[var(--border)]">{members.map((member) => <div key={member.id} className="flex flex-wrap items-center justify-between gap-4 p-5"><div className="flex min-w-0 items-center gap-3"><div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--surface-raised)] font-bold text-[var(--mint)]">{(member.user.name ?? member.user.email ?? "?").slice(0,1).toUpperCase()}</div><div className="min-w-0"><p className="truncate text-sm font-bold">{member.user.name ?? "Unnamed user"}</p><p className="truncate text-xs muted">{member.user.email ?? "No email available"}</p></div></div><div className="flex flex-wrap items-center gap-2"><span className="rounded-full border border-[var(--border)] px-3 py-1 text-xs muted">{member.role}</span>{canManage && member.role !== "OWNER" && (currentRole === "OWNER" || member.role !== "ADMIN") ? <><select aria-label={`Role for ${member.user.email ?? member.id}`} className="field !w-auto !py-2 text-xs" value={member.role} disabled={busy} onChange={(event) => void memberAction(member.id, "PATCH", event.target.value)}><option value="ADMIN" disabled={currentRole !== "OWNER"}>Admin</option><option value="MEMBER">Member</option><option value="VIEWER">Viewer</option></select><button className="action-danger" disabled={busy} onClick={() => void memberAction(member.id, "DELETE")}>Remove</button></> : null}</div></div>)}</div> : <p className="p-6 text-sm muted">No members found.</p>}
+        {loading ? <p className="p-6 text-sm muted">Loading organization team…</p> : members.length ? <div className="divide-y divide-[var(--border)]">{members.map((member) => <div key={member.id} className="flex flex-wrap items-center justify-between gap-4 p-5"><div className="flex min-w-0 items-center gap-3"><div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--surface-raised)] font-bold text-[var(--mint)]">{(member.user.name ?? member.user.email ?? "?").slice(0,1).toUpperCase()}</div><div className="min-w-0"><p className="truncate text-sm font-bold">{member.user.name ?? "Unnamed user"}</p><p className="truncate text-xs muted">{member.user.email ?? "No email available"}</p></div></div><div className="flex flex-wrap items-center gap-2"><span className="rounded-full border border-[var(--border)] px-3 py-1 text-xs muted">{member.role}</span>{currentRole === "OWNER" && member.role !== "OWNER" ? <button className="action-secondary" disabled={busy} onClick={() => void transferOwnership(member)}>Transfer ownership</button> : null}{canManage && member.role !== "OWNER" && (currentRole === "OWNER" || member.role !== "ADMIN") ? <><select aria-label={`Role for ${member.user.email ?? member.id}`} className="field !w-auto !py-2 text-xs" value={member.role} disabled={busy} onChange={(event) => void memberAction(member.id, "PATCH", event.target.value)}><option value="ADMIN" disabled={currentRole !== "OWNER"}>Admin</option><option value="MEMBER">Member</option><option value="VIEWER">Viewer</option></select><button className="action-danger" disabled={busy} onClick={() => void memberAction(member.id, "DELETE")}>Remove</button></> : null}</div></div>)}</div> : <p className="p-6 text-sm muted">No members found.</p>}
       </section>
 
       <section className="panel overflow-hidden">
