@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   requireMember: vi.fn(),
-  findFirstMember: vi.fn(),
+  findFirstMember: vi.fn(),\n  findOrganization: vi.fn(),
   findManyInvitations: vi.fn(),
   findUniqueInvitation: vi.fn(),
   upsertInvitation: vi.fn(),
@@ -16,7 +16,7 @@ vi.mock("@/lib/tenant", () => ({
 }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    organizationMember: { findFirst: mocks.findFirstMember },
+    organization: { findUnique: mocks.findOrganization },\n    organizationMember: { findFirst: mocks.findFirstMember },
     organizationInvitation: {
       findMany: mocks.findManyInvitations,
       findUnique: mocks.findUniqueInvitation,
@@ -24,7 +24,7 @@ vi.mock("@/lib/prisma", () => ({
     $transaction: mocks.transaction,
   },
 }));
-vi.mock("@/lib/invitations", () => ({
+vi.mock("@/lib/invitation-email", () => ({\n  sendOrganizationInvitationEmail: vi.fn().mockResolvedValue({ delivered: false, reason: "NOT_CONFIGURED" }),\n}));\nvi.mock("@/lib/invitations", () => ({
   generateInvitationToken: () => ({ secret: "sf_inv_one_time_secret_token", tokenHash: "a".repeat(64) }),
 }));
 
@@ -45,7 +45,7 @@ describe("organization invitation collection", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.requireMember.mockResolvedValue({ user: { id: "user_owner" }, membership: { role: "OWNER" } });
-    mocks.findFirstMember.mockResolvedValue(null);
+    mocks.findFirstMember.mockResolvedValue(null);\n    mocks.findOrganization.mockResolvedValue({ name: "SignalForge Test" });
     mocks.findManyInvitations.mockResolvedValue([]);
     mocks.findUniqueInvitation.mockResolvedValue(null);
     mocks.upsertInvitation.mockResolvedValue({
