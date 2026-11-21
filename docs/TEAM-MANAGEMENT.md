@@ -36,7 +36,7 @@ Requires OWNER or ADMIN.
 }
 ```
 
-Allowed roles: `ADMIN`, `MEMBER`, `VIEWER`. OWNER cannot be assigned by invitation.
+Allowed roles: `ADMIN`, `MEMBER`, `VIEWER`. OWNER cannot be assigned by invitation. Only an OWNER can issue an ADMIN invitation.
 
 The 201 response includes `acceptanceToken` exactly once. Deliver it securely to the intended invitee. SignalForge does not yet send invitation email automatically; email delivery provider integration is a separate roadmap item.
 
