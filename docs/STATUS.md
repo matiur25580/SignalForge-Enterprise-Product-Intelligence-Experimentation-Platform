@@ -60,7 +60,7 @@ Last updated: 2026-11-21
 
 ## Verification
 
-The latest verified baseline before the API-key and usage UI changes is GitHub Actions run [44878888794](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44878888794), which passed clean PostgreSQL 16 migrations, all 39 automated tests, ESLint, TypeScript typecheck, and the Next.js production build. The new UI changes are awaiting their own CI run.
+The latest GitHub Actions run [44879418883](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44879418883) passed after the API-key, usage, and billing UI changes. It completed clean PostgreSQL 16 migrations, all 39 automated tests, ESLint, TypeScript typecheck, and the Next.js production build.
 - dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
 - Prisma Client generation and schema validation
 - all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
