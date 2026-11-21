@@ -17,6 +17,7 @@ export async function authenticateIngestionKey(request: Request) {
       projectId: true,
       expiresAt: true,
       revokedAt: true,
+      organization: { select: { plan: true } },
     },
   });
 
