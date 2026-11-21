@@ -118,67 +118,67 @@ flowchart LR
 
 ## Dashboard concepts
 
-The following 12 screens illustrate the intended product experience and information architecture. They are original SVG design previews, presented in a **single vertical column** for easy review. All figures, activity rows, and chart values are illustrative; these screens are not wired to live product data.
+The following 12 screens illustrate the intended product experience and information architecture. They are original SVG design previews, presented in a **single vertical column** for easy review. The previews use GitHub's HTML image renderer with direct-open links so each design can still be opened if a Markdown client does not render inline SVG. All figures, activity rows, and chart values are illustrative; these screens are not wired to live product data.
 
 ### 01 · Executive overview
 A high-level workspace snapshot for activation, engagement, conversion, and overall product health.
 
-![SignalForge executive overview dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-01-executive-overview.svg)
+<a href="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-01-executive-overview.svg"><img src="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-01-executive-overview.svg" alt="SignalForge executive overview dashboard concept" width="100%" /></a>
 
 ### 02 · Event intelligence
 An operational view of event volume, accepted traffic, duplicate rates, and source health.
 
-![SignalForge event intelligence dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-02-event-intelligence.svg)
+<a href="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-02-event-intelligence.svg"><img src="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-02-event-intelligence.svg" alt="SignalForge event intelligence dashboard concept" width="100%" /></a>
 
 ### 03 · Conversion funnels
 A focused analysis surface for conversion steps, drop-off points, and checkout performance.
 
-![SignalForge conversion funnels dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-03-conversion-funnels.svg)
+<a href="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-03-conversion-funnels.svg"><img src="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-03-conversion-funnels.svg" alt="SignalForge conversion funnels dashboard concept" width="100%" /></a>
 
 ### 04 · User journeys
 A journey exploration workspace for understanding common paths, key transitions, and exits.
 
-![SignalForge user journeys dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-04-user-journeys.svg)
+<a href="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-04-user-journeys.svg"><img src="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-04-user-journeys.svg" alt="SignalForge user journeys dashboard concept" width="100%" /></a>
 
 ### 05 · Cohorts & retention
 A retention view for comparing acquisition cohorts and tracking long-term engagement.
 
-![SignalForge cohorts and retention dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-05-cohorts-retention.svg)
+<a href="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-05-cohorts-retention.svg"><img src="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-05-cohorts-retention.svg" alt="SignalForge cohorts and retention dashboard concept" width="100%" /></a>
 
 ### 06 · Experimentation
 An experiment operations view for enrollment, outcome movement, and sample-ratio monitoring.
 
-![SignalForge experimentation dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-06-experimentation.svg)
+<a href="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-06-experimentation.svg"><img src="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-06-experimentation.svg" alt="SignalForge experimentation dashboard concept" width="100%" /></a>
 
 ### 07 · Feature flags
 A release governance view for flag inventory, rollout coverage, and operational safety.
 
-![SignalForge feature flags dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-07-feature-flags.svg)
+<a href="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-07-feature-flags.svg"><img src="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-07-feature-flags.svg" alt="SignalForge feature flags dashboard concept" width="100%" /></a>
 
 ### 08 · Audience cohorts
 A segmentation workspace for defining behavioral audiences and understanding their size.
 
-![SignalForge audience cohorts dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-08-audience-cohorts.svg)
+<a href="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-08-audience-cohorts.svg"><img src="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-08-audience-cohorts.svg" alt="SignalForge audience cohorts dashboard concept" width="100%" /></a>
 
 ### 09 · Data quality
 A data observability concept for schema compliance, drift alerts, and event validation.
 
-![SignalForge data quality dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-09-data-quality.svg)
+<a href="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-09-data-quality.svg"><img src="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-09-data-quality.svg" alt="SignalForge data quality dashboard concept" width="100%" /></a>
 
 ### 10 · Usage & quotas
 An organization consumption view for event volume, API-key activity, and quota awareness.
 
-![SignalForge usage and quotas dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-10-usage-quotas.svg)
+<a href="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-10-usage-quotas.svg"><img src="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-10-usage-quotas.svg" alt="SignalForge usage and quotas dashboard concept" width="100%" /></a>
 
 ### 11 · API key security
 A credential administration concept for key lifecycle, expiry hygiene, and revocation review.
 
-![SignalForge API key security dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-11-api-key-security.svg)
+<a href="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-11-api-key-security.svg"><img src="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-11-api-key-security.svg" alt="SignalForge API key security dashboard concept" width="100%" /></a>
 
 ### 12 · Audit & governance
 An accountability view for administrative activity, policy checks, and review workflows.
 
-![SignalForge audit and governance dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-12-audit-governance.svg)
+<a href="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-12-audit-governance.svg"><img src="https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/raw/refs/heads/main/docs/images/dashboard-12-audit-governance.svg" alt="SignalForge audit and governance dashboard concept" width="100%" /></a>
 
 ## Technology stack
 
