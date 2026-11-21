@@ -10,6 +10,7 @@ Last updated: 2026-11-21
 - [x] Initial dashboard shell with honest empty states
 - [x] PostgreSQL Prisma schema, shared client, and committed migration history
 - [x] Auth.js GitHub OAuth and database-backed sessions
+- [x] Account security page with private active-session inventory and remote revocation of other sessions
 - [x] Organization creation, memberships, roles, and server-side tenant authorization
 - [x] Organization-scoped project creation and listing
 - [x] Transactional audit records for organization and project lifecycle actions
@@ -26,6 +27,7 @@ Last updated: 2026-11-21
 - [x] Transactional audit records for invitation and membership lifecycle actions
 - [x] Organization activity timeline page and tenant-scoped cursor-paginated audit API
 - [x] Invitation and member-management API tests
+- [ ] Active-session API tests and full session lifecycle verification
 
 ### Event ingestion and usage
 - [x] Strict, bounded batch event ingestion with project-scoped tenant checks
