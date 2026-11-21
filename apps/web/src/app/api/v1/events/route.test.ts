@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   projectFindFirst: vi.fn(),
   createMany: vi.fn(),
+  queryRaw: vi.fn(),
   updateApiKey: vi.fn(),
   transaction: vi.fn(),
   authenticate: vi.fn(),
@@ -57,9 +58,11 @@ describe("POST /api/v1/events", () => {
     mocks.authenticate.mockResolvedValue({ ok: true, apiKey: { ...activeKey } });
     mocks.projectFindFirst.mockResolvedValue({ id: projectId, environment: "PRODUCTION" });
     mocks.createMany.mockResolvedValue({ count: 1 });
+    mocks.queryRaw.mockResolvedValue([{ remainingRequests: 119, remainingEvents: 9_999 }]);
     mocks.updateApiKey.mockResolvedValue({});
     const tx = {
       event: { createMany: mocks.createMany },
+      $queryRaw: mocks.queryRaw,
       apiKey: { update: mocks.updateApiKey },
     };
     mocks.transaction.mockImplementation(
@@ -74,6 +77,10 @@ describe("POST /api/v1/events", () => {
 
     expect(response.status).toBe(202);
     expect(payload).toEqual({ accepted: 1, duplicates: 0 });
+    expect(response.headers.get("x-ratelimit-limit")).toBe("120");
+    expect(response.headers.get("x-ratelimit-remaining")).toBe("119");
+    expect(response.headers.get("x-ratelimit-remaining-events")).toBe("9999");
+    expect(mocks.queryRaw).toHaveBeenCalledTimes(1);
     expect(mocks.projectFindFirst).toHaveBeenCalledWith({
       where: { id: projectId, organizationId: "org_1" },
       select: { id: true, environment: true },
@@ -97,6 +104,21 @@ describe("POST /api/v1/events", () => {
     mocks.createMany.mockResolvedValue({ count: 0 });
     const response = await POST(makeRequest(validBatch()));
     expect(await response.json()).toEqual({ accepted: 0, duplicates: 1 });
+  });
+
+
+  it("returns 429 with retry metadata when the per-key quota is exhausted", async () => {
+    mocks.queryRaw.mockResolvedValue([]);
+    const response = await POST(makeRequest(validBatch()));
+    const payload = await response.json();
+
+    expect(response.status).toBe(429);
+    expect(payload.error).toBe("Ingestion rate limit exceeded");
+    expect(payload.limits).toEqual({ requestsPerMinute: 120, eventsPerMinute: 10_000 });
+    expect(Number(response.headers.get("retry-after"))).toBeGreaterThan(0);
+    expect(response.headers.get("x-ratelimit-remaining")).toBe("0");
+    expect(mocks.createMany).not.toHaveBeenCalled();
+    expect(mocks.updateApiKey).not.toHaveBeenCalled();
   });
 
   it("rejects a project-bound key used against another project", async () => {
