@@ -2,7 +2,7 @@ import { Prisma, ProjectEnvironment } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { authenticateIngestionKey } from "@/lib/ingestion-auth";
-import { INGESTION_LIMITS, reserveIngestionQuota } from "@/lib/ingestion-rate-limit";
+import { INGESTION_LIMITS, reserveIngestionQuota, type IngestionQuotaLimits } from "@/lib/ingestion-rate-limit";
 import { getPlanIngestionLimits } from "@/lib/subscription-plans";
 
 export const runtime = "nodejs";
@@ -28,7 +28,7 @@ type RateLimitState = {
   remainingEvents: number;
 };
 
-function rateLimitHeaders(state: RateLimitState, resetAt: Date, limits: typeof INGESTION_LIMITS) {
+function rateLimitHeaders(state: RateLimitState, resetAt: Date, limits: IngestionQuotaLimits) {
   return {
     "X-RateLimit-Limit": String(limits.requestsPerMinute),
     "X-RateLimit-Remaining": String(state.remainingRequests),
