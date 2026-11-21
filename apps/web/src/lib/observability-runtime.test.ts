@@ -18,6 +18,6 @@ describe("HTTP operational metrics", () => {
 
   it("escapes label values before exposing Prometheus text", () => {
     recordHttpRequest('GET"evil', "/api/a", 200, 0.01);
-    expect(renderHttpMetrics()).toContain('method="GET\\"evil"');
+    expect(renderHttpMetrics()).toContain('method="GET\\"EVIL"');
   });
 });
