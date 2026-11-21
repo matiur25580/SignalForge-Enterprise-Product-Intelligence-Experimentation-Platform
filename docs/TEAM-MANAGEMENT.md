@@ -102,6 +102,6 @@ OWNER can remove non-owner members. ADMIN can remove MEMBER and VIEWER only. Own
 ## Current limitations
 
 - No email provider integration or automated delivery.
-- No self-service invitation acceptance UI yet; API is available.
+- The authenticated team-management UI supports invite creation, one-time token copying, member role changes/removal, and pending invitation revocation.\n- No invitee-facing invitation acceptance UI or automatic email delivery yet; the acceptance API is available.
 - Organization member role changes and member removal are not yet implemented.
 - The GitHub OAuth account email is used as the invitation identity.
