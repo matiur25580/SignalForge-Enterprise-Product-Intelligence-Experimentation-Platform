@@ -42,7 +42,7 @@ Last updated: 2026-11-21
 
 ## Not implemented yet
 
-- [ ] Automatic invitation email delivery and invitation acceptance UI
+- [ ] Automatic invitation email delivery and invitee invitation acceptance UI
 - [ ] Ownership transfer and owner lifecycle workflows
 - [ ] Local application setup and production runtime/database verification
 - [ ] API-key rotation and self-service key lifecycle policies
@@ -57,7 +57,7 @@ Last updated: 2026-11-21
 
 ## Verification
 
-The latest GitHub Actions run [44878464322](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44878464322) passed all workflow stages:
+The latest verified baseline before the workspace UI changes is GitHub Actions run [44878608454](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44878608454), which passed all workflow stages and 39 automated tests. The newly added UI changes are awaiting their own CI verification.
 - dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
 - Prisma Client generation and schema validation
 - all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
