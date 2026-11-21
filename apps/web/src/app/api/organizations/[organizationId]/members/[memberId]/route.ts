@@ -2,6 +2,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { apiError, requireOrganizationMember } from "@/lib/tenant";
+import { clientAddressFromHeaders, consumeSharedRateLimit, MEMBER_MUTATION_RATE_LIMIT, rateLimitResponse } from "@/lib/auth-rate-limit";
 
 type RouteContext = {
   params: Promise<{ organizationId: string; memberId: string }>;
@@ -15,6 +16,13 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   try {
     const { organizationId, memberId } = await params;
     const { user, membership: actor } = await requireOrganizationMember(organizationId, ["OWNER", "ADMIN"]);
+    let limit;
+    try {
+      limit = await consumeSharedRateLimit(`member:mutate:${organizationId}:${user.id}:ip:${clientAddressFromHeaders(request.headers)}`, MEMBER_MUTATION_RATE_LIMIT);
+    } catch {
+      return Response.json({ error: "Member management is temporarily unavailable" }, { status: 503 });
+    }
+    if (!limit.allowed) return rateLimitResponse(limit.retryAfterSeconds, limit.limit);
     const input = updateRoleSchema.parse(await request.json());
 
     const target = await prisma.organizationMember.findFirst({
