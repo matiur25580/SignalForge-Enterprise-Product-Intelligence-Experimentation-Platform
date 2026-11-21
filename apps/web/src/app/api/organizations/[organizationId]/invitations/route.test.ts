@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   requireMember: vi.fn(),
-  findFirstMember: vi.fn(),\n  findOrganization: vi.fn(),
+  findFirstMember: vi.fn(),
+  findOrganization: vi.fn(),
   findManyInvitations: vi.fn(),
   findUniqueInvitation: vi.fn(),
   upsertInvitation: vi.fn(),
@@ -16,7 +17,8 @@ vi.mock("@/lib/tenant", () => ({
 }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    organization: { findUnique: mocks.findOrganization },\n    organizationMember: { findFirst: mocks.findFirstMember },
+    organization: { findUnique: mocks.findOrganization },
+    organizationMember: { findFirst: mocks.findFirstMember },
     organizationInvitation: {
       findMany: mocks.findManyInvitations,
       findUnique: mocks.findUniqueInvitation,
@@ -24,7 +26,10 @@ vi.mock("@/lib/prisma", () => ({
     $transaction: mocks.transaction,
   },
 }));
-vi.mock("@/lib/invitation-email", () => ({\n  sendOrganizationInvitationEmail: vi.fn().mockResolvedValue({ delivered: false, reason: "NOT_CONFIGURED" }),\n}));\nvi.mock("@/lib/invitations", () => ({
+vi.mock("@/lib/invitation-email", () => ({
+  sendOrganizationInvitationEmail: vi.fn().mockResolvedValue({ delivered: false, reason: "NOT_CONFIGURED" }),
+}));
+vi.mock("@/lib/invitations", () => ({
   generateInvitationToken: () => ({ secret: "sf_inv_one_time_secret_token", tokenHash: "a".repeat(64) }),
 }));
 
@@ -45,7 +50,8 @@ describe("organization invitation collection", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.requireMember.mockResolvedValue({ user: { id: "user_owner" }, membership: { role: "OWNER" } });
-    mocks.findFirstMember.mockResolvedValue(null);\n    mocks.findOrganization.mockResolvedValue({ name: "SignalForge Test" });
+    mocks.findFirstMember.mockResolvedValue(null);
+    mocks.findOrganization.mockResolvedValue({ name: "SignalForge Test" });
     mocks.findManyInvitations.mockResolvedValue([]);
     mocks.findUniqueInvitation.mockResolvedValue(null);
     mocks.upsertInvitation.mockResolvedValue({
@@ -83,8 +89,9 @@ describe("organization invitation collection", () => {
 
     expect(response.status).toBe(201);
     expect(body.invitation.email).toBe("analyst@example.com");
-    expect(body.invitation.acceptanceToken).toBe("sf_inv_one_time_secret_token");
-    expect(body.invitation.warning).toContain("shown only once");
+    expect(body.invitation.delivery).toBe("MANUAL");
+    expect(body.invitation.acceptanceUrl).toContain("/invitations/accept?token=sf_inv_one_time_secret_token");
+    expect(body.invitation.warning).toContain("Share this single-use link securely");
     expect(mocks.upsertInvitation).toHaveBeenCalledWith(expect.objectContaining({
       where: { organizationId_email: { organizationId, email: "analyst@example.com" } },
       create: expect.objectContaining({ role: "MEMBER", tokenHash: "a".repeat(64) }),
