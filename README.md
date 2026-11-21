@@ -37,7 +37,8 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 | API credentials | Cryptographically random secrets, SHA-256 hash-only storage, one-time display, expiry, and revocation |
 | Event ingestion | Strictly validated batch endpoint, bounded payloads, server-derived environment, and duplicate protection |
 | Rate limiting | Atomic PostgreSQL per-key limits: 120 requests and 10,000 submitted events per minute |
-| Usage intelligence | Authenticated organization usage report with project and API-key breakdowns |\n| Plan entitlements | Free, Pro, and Enterprise organization tiers with plan-specific atomic per-key ingestion quotas |
+| Usage intelligence | Authenticated organization usage report with project and API-key breakdowns |
+| Plan entitlements | Free, Pro, and Enterprise organization tiers with plan-specific atomic per-key ingestion quotas |
 | Auditability | Transactional audit records for organization, project, and API-key lifecycle actions |
 | Database delivery | Committed Prisma migrations applied against clean PostgreSQL in CI |
 | Quality gates | Vitest, ESLint, TypeScript checks, Prisma validation, and production build in GitHub Actions |
@@ -276,7 +277,8 @@ CI success verifies the checks in that workflow; it does not imply that a produc
 - [x] Secure API-key lifecycle and scoped event ingestion
 - [x] Atomic per-key request and event quotas
 - [x] Organization-level usage reporting
-- [x] Plan catalog and organization-level Free/Pro/Enterprise ingestion entitlements\n- [ ] Payment-backed subscription lifecycle, self-service upgrades, and billing
+- [x] Plan catalog and organization-level Free/Pro/Enterprise ingestion entitlements
+- [ ] Payment-backed subscription lifecycle, self-service upgrades, and billing
 - [ ] API-key rotation workflow and usage threshold notifications
 - [ ] Product SDKs and durable event transport
 - [ ] ClickHouse-backed funnels, journeys, cohorts, and retention
@@ -292,7 +294,8 @@ CI success verifies the checks in that workflow; it does not imply that a produc
 - [Security baseline](docs/SECURITY.md)
 - [API key lifecycle](docs/API-KEYS.md)
 - [Event ingestion contract](docs/EVENT-INGESTION.md)
-- [Usage metering](docs/USAGE-METERING.md)\n- [Subscription plans](docs/SUBSCRIPTION-PLANS.md)
+- [Usage metering](docs/USAGE-METERING.md)
+- [Subscription plans](docs/SUBSCRIPTION-PLANS.md)
 - [Automated testing](docs/TESTING.md)
 - [Implementation status](docs/STATUS.md)
 
