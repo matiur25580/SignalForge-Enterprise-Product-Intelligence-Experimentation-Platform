@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { apiError, requireOrganizationMember } from "@/lib/tenant";
 import { generateApiKey } from "@/lib/api-keys";
+import { clientAddressFromHeaders, consumeSharedRateLimit, API_KEY_CREATE_RATE_LIMIT, rateLimitResponse } from "@/lib/auth-rate-limit";
 
 type RouteContext = { params: Promise<{ organizationId: string }> };
 
@@ -34,6 +35,13 @@ export async function POST(request: Request, { params }: RouteContext) {
   try {
     const { organizationId } = await params;
     const { user } = await requireOrganizationMember(organizationId, ["OWNER", "ADMIN"]);
+    let limit;
+    try {
+      limit = await consumeSharedRateLimit(`api-key:create:${organizationId}:${user.id}:ip:${clientAddressFromHeaders(request.headers)}`, API_KEY_CREATE_RATE_LIMIT);
+    } catch {
+      return Response.json({ error: "API key creation is temporarily unavailable" }, { status: 503 });
+    }
+    if (!limit.allowed) return rateLimitResponse(limit.retryAfterSeconds, limit.limit);
     const input = createApiKeySchema.parse(await request.json());
 
     if (input.projectId) {
