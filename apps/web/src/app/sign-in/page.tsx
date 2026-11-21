@@ -2,6 +2,7 @@ import { signIn } from "../../../auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { clientAddressFromHeaders, consumeAuthRateLimit } from "@/lib/auth-rate-limit";
+import { safeCallbackPath } from "@/lib/safe-callback-url";
 
 export default async function SignInPage({
   searchParams,
@@ -9,12 +10,7 @@ export default async function SignInPage({
   searchParams: Promise<{ callbackUrl?: string; error?: string }>;
 }) {
   const { callbackUrl, error } = await searchParams;
-  const redirectTo =
-    callbackUrl?.startsWith("/") &&
-    !callbackUrl.startsWith("//") &&
-    !callbackUrl.includes("\\\\")
-      ? callbackUrl
-      : "/";
+  const redirectTo = safeCallbackPath(callbackUrl);
   const rateLimited = error === "rate_limit";
 
   return (
@@ -34,7 +30,7 @@ export default async function SignInPage({
           "use server";
           const requestHeaders = await headers();
           try {
-            const result = await consumeAuthRateLimit(clientAddressFromHeaders(requestHeaders));
+            const result = await consumeAuthRateLimit(`ip:${clientAddressFromHeaders(requestHeaders)}`);
             if (!result.allowed) redirect("/sign-in?error=rate_limit");
           } catch (cause) {
             if (cause && typeof cause === "object" && "digest" in cause) throw cause;
