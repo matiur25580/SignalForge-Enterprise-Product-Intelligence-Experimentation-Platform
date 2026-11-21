@@ -4,7 +4,7 @@
 
 SignalForge is an event-driven product analytics and experimentation platform designed to help teams understand user behaviour, measure product outcomes, and make statistically responsible decisions.
 
-> **Build status:** Multi-tenant identity, API-key management, and the first PostgreSQL-backed event ingestion path are implemented. The committed database migration is exercised by CI against a clean PostgreSQL service. Full runtime integration tests and production deployment remain outstanding.
+> **Build status:** Multi-tenant identity, API-key management, and PostgreSQL-backed event ingestion with atomic per-key quotas are implemented. CI applies migrations to a clean PostgreSQL service and exercises quota concurrency against the database. Production runtime verification and deployment remain outstanding.
 
 ## Implemented foundations
 
@@ -16,11 +16,13 @@ SignalForge is an event-driven product analytics and experimentation platform de
 - Server-side membership checks; only owners and admins can create projects and manage API keys
 - Hash-only API-key storage, one-time secret issuance, expiry and revocation checks
 - Project-scoped batch event ingestion with strict validation and duplicate protection
-- Committed initial PostgreSQL migration and CI migration-apply verification
+- Atomic per-API-key limits: 120 requests and 10,000 submitted events per minute, with HTTP 429 retry guidance
+- PostgreSQL concurrency tests proving quota enforcement under simultaneous requests
+- Committed PostgreSQL migrations and CI migration-apply verification
 
 ## Product roadmap
 
-- Product SDK, rate limiting, quotas, and API-key rotation
+- Product SDK, plan-based quotas, usage metering, and API-key rotation
 - Durable event transport and processing with Kafka-compatible infrastructure
 - ClickHouse-backed funnels, journeys, cohorts, retention, and feature adoption analytics
 - Feature flags and controlled rollouts
@@ -84,7 +86,7 @@ Send a batch to `POST /api/v1/events` with `Authorization: Bearer sf_live_<secre
 
 ## Verification status
 
-GitHub Actions runs the automated ingestion/authentication test suite, validates the Prisma schema, applies committed migrations to an ephemeral PostgreSQL 16 service, then runs lint, typecheck, and a production build. Database-backed integration tests and production rollout are separate steps and are not implied by CI success.
+GitHub Actions validates the Prisma schema, applies committed migrations to an ephemeral PostgreSQL 16 service, runs mocked ingestion/authentication tests plus PostgreSQL-backed quota concurrency tests, then runs lint, typecheck, and a production build. Production runtime verification and rollout are separate steps and are not implied by CI success.
 
 ## Security
 
