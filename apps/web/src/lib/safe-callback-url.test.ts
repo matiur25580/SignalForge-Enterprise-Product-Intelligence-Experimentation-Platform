@@ -13,7 +13,7 @@ describe("safeCallbackPath", () => {
   });
 
   it("rejects backslash and encoded backslash redirect tricks", () => {
-    expect(safeCallbackPath("/\\\\attacker.example")).toBe("/");
+    expect(safeCallbackPath(String.raw`/\\attacker.example`)).toBe("/");
     expect(safeCallbackPath("/%5c%5cattacker.example")).toBe("/");
   });
 
