@@ -33,7 +33,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 |---|---|
 | Identity | Auth.js GitHub OAuth and database-backed sessions |
 | Multi-tenancy | Organizations, memberships, roles, and server-side access checks |
-| Team management | Secure email-bound invitations, member directory, role administration, guarded removal, single-use acceptance, revocation, audit trail, and interactive team UI |
+| Team management | Secure email-bound invitations with optional Resend delivery, member directory, role administration, guarded removal, single-use acceptance, revocation, audit trail, and interactive team UI |
 | Workspace UI | Authenticated organization dashboard, workspace creation, project registry, team administration, and invitation token handling |
 | Projects | Organization-scoped project creation and listing |
 | API credentials | Cryptographically random secrets, SHA-256 hash-only storage, one-time display, expiry, revocation, atomic audited rotation, and interactive organization key console |
@@ -48,7 +48,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 
 ### Team invitations
 
-Organization OWNERs can invite teammates as ADMIN, MEMBER, or VIEWER; ADMINs can invite MEMBER or VIEWER only. Invitation tokens are generated using cryptographically secure randomness, stored only as SHA-256 hashes, expire after seven days, and can be accepted only by a signed-in account with the matching email. Members can be listed, roles can be changed under a strict OWNER/ADMIN hierarchy, and non-owner members can be removed. Acceptance, role changes, revocation, and removal are transactional and audited. The API returns the invitation token once; the team UI displays it once with a copy action. Automatic email delivery and a dedicated invitee acceptance page are not implemented yet. See [Team management](docs/TEAM-MANAGEMENT.md).
+Organization OWNERs can invite teammates as ADMIN, MEMBER, or VIEWER; ADMINs can invite MEMBER or VIEWER only. Invitation tokens are generated using cryptographically secure randomness, stored only as SHA-256 hashes, expire after seven days, and can be accepted only by a signed-in account with the matching email. Members can be listed, roles can be changed under a strict OWNER/ADMIN hierarchy, and non-owner members can be removed. Acceptance, role changes, revocation, and removal are transactional and audited. When Resend credentials are configured, invitations are emailed with a single-use acceptance link and the raw token is not returned to the inviter. Without email credentials, the API provides a one-time manual acceptance URL. A dedicated invitee acceptance page remains on the roadmap. Configure `RESEND_API_KEY`, `EMAIL_FROM`, and `AUTH_URL` to enable delivery. See [Team management](docs/TEAM-MANAGEMENT.md).
 
 ### Event ingestion contract
 
