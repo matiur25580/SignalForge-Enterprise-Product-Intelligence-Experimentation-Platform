@@ -25,7 +25,7 @@ Product teams collect events, run experiments, and ship features—but the evide
 
 The project emphasizes the engineering foundations behind a credible SaaS product: tenant isolation, scoped credentials, idempotent ingestion, atomic quotas, auditable actions, and automated verification.
 
-> **Current implementation status:** The repository contains a working Next.js application foundation and backend APIs for multi-tenant identity, projects, API keys, event ingestion, per-key quotas, and organization usage reporting. The 12 dashboard images below are **conceptual product-design previews with illustrative data**, not screenshots of currently implemented live dashboard pages. Production deployment and runtime verification have not been performed.
+> **Current implementation status:** The repository contains a Next.js application with authenticated workspace, organization/team and project management screens, plus backend APIs for multi-tenant identity, projects, API keys, event ingestion, per-key quotas, and organization usage reporting. The 12 dashboard images below are **conceptual product-design previews with illustrative data**, not screenshots of currently implemented live dashboard pages. Production deployment and runtime verification have not been performed.
 
 ## Implemented capabilities
 
@@ -33,7 +33,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 |---|---|
 | Identity | Auth.js GitHub OAuth and database-backed sessions |
 | Multi-tenancy | Organizations, memberships, roles, and server-side access checks |
-| Team management | Secure email-bound invitations, member directory, role administration, guarded removal, single-use acceptance, revocation, and audit trail |
+| Team management | Secure email-bound invitations, member directory, role administration, guarded removal, single-use acceptance, revocation, audit trail, and interactive team UI |\n| Workspace UI | Authenticated organization dashboard, workspace creation, project registry, team administration, and invitation token handling |
 | Projects | Organization-scoped project creation and listing |
 | API credentials | Cryptographically random secrets, SHA-256 hash-only storage, one-time display, expiry, and revocation |
 | Event ingestion | Strictly validated batch endpoint, bounded payloads, server-derived environment, and duplicate protection |
@@ -46,7 +46,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 
 ### Team invitations
 
-Organization OWNERs can invite teammates as ADMIN, MEMBER, or VIEWER; ADMINs can invite MEMBER or VIEWER only. Invitation tokens are generated using cryptographically secure randomness, stored only as SHA-256 hashes, expire after seven days, and can be accepted only by a signed-in account with the matching email. Members can be listed, roles can be changed under a strict OWNER/ADMIN hierarchy, and non-owner members can be removed. Acceptance, role changes, revocation, and removal are transactional and audited. The API returns the invitation token once; automatic email delivery and the invitation UI are not implemented yet. See [Team management](docs/TEAM-MANAGEMENT.md).
+Organization OWNERs can invite teammates as ADMIN, MEMBER, or VIEWER; ADMINs can invite MEMBER or VIEWER only. Invitation tokens are generated using cryptographically secure randomness, stored only as SHA-256 hashes, expire after seven days, and can be accepted only by a signed-in account with the matching email. Members can be listed, roles can be changed under a strict OWNER/ADMIN hierarchy, and non-owner members can be removed. Acceptance, role changes, revocation, and removal are transactional and audited. The API returns the invitation token once; the team UI displays it once with a copy action. Automatic email delivery and a dedicated invitee acceptance page are not implemented yet. See [Team management](docs/TEAM-MANAGEMENT.md).
 
 ### Event ingestion contract
 
@@ -282,9 +282,9 @@ CI success verifies the checks in that workflow; it does not imply that a produc
 - [x] Secure API-key lifecycle and scoped event ingestion
 - [x] Atomic per-key request and event quotas
 - [x] Organization-level usage reporting
-- [x] Plan catalog and organization-level Free/Pro/Enterprise ingestion entitlements
+- [x] Plan catalog and organization-level Free/Pro/Enterprise ingestion entitlements\n- [x] Authenticated workspace dashboard, organization creation, project registry, and team management UI
 - [ ] Payment-backed subscription lifecycle, self-service upgrades, and billing
-- [ ] API-key rotation workflow and usage threshold notifications
+- [ ] API-key rotation workflow and usage threshold notifications\n- [ ] Invitation email delivery and invitee acceptance UI
 - [ ] Product SDKs and durable event transport
 - [ ] ClickHouse-backed funnels, journeys, cohorts, and retention
 - [ ] Feature flag evaluation and controlled rollouts
