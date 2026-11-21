@@ -105,7 +105,6 @@ model Project {
   organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   apiKeys        ApiKey[]
   events         Event[]
-  ingestionRateLimit IngestionRateLimit?
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
 
