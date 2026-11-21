@@ -40,7 +40,7 @@ describe("POST /api/invitations/accept", () => {
     vi.clearAllMocks();
     mocks.requireUser.mockResolvedValue({ id: "user_invited", email: "analyst@example.com" });
     mocks.findInvitation.mockResolvedValue({
-      id: "invite_1", organizationId: "org_1", email: "analyst@example.com",
+      id: "invite_1", organizationId: "org_1", email: "analyst@example.com", tokenHash: "b".repeat(64),
       role: "MEMBER", expiresAt: new Date(Date.now() + 60_000),
       acceptedAt: null, revokedAt: null,
     });
@@ -80,7 +80,7 @@ describe("POST /api/invitations/accept", () => {
 
   it("rejects expired invitations", async () => {
     mocks.findInvitation.mockResolvedValue({
-      id: "invite_1", organizationId: "org_1", email: "analyst@example.com",
+      id: "invite_1", organizationId: "org_1", email: "analyst@example.com", tokenHash: "b".repeat(64),
       role: "MEMBER", expiresAt: new Date(Date.now() - 60_000),
       acceptedAt: null, revokedAt: null,
     });
@@ -91,7 +91,7 @@ describe("POST /api/invitations/accept", () => {
 
   it("does not accept the same invitation twice", async () => {
     mocks.findInvitation.mockResolvedValue({
-      id: "invite_1", organizationId: "org_1", email: "analyst@example.com",
+      id: "invite_1", organizationId: "org_1", email: "analyst@example.com", tokenHash: "b".repeat(64),
       role: "MEMBER", expiresAt: new Date(Date.now() + 60_000),
       acceptedAt: new Date(), revokedAt: null,
     });
