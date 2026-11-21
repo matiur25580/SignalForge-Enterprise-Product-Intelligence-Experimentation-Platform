@@ -45,7 +45,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 | Account security | Private active-session inventory, current-session protection, one-way session identifiers, per-session remote revocation, and OAuth sign-in abuse protection |
 | Auditability | Transactional audit records, tenant-scoped activity timeline, and OWNER/ADMIN security alerts for suspicious API-key, invitation, member-access, and ownership activity |
 | Database delivery | Committed Prisma migrations applied against clean PostgreSQL in CI |
-| Quality gates | Vitest, ESLint, TypeScript checks, Prisma validation, and production build in GitHub Actions |
+| Observability foundation | Database readiness endpoint at `/api/health`; protected Prometheus metrics at `/api/internal/metrics` for organizations, projects, events, active API keys, and open security alerts |\n| Quality gates | Vitest, ESLint, TypeScript checks, Prisma validation, and production build in GitHub Actions |
 
 ### Team invitations
 
@@ -85,7 +85,7 @@ The endpoint validates the payload, verifies API-key scope and lifecycle state, 
 
 `GET /api/organizations/:organizationId/usage` returns organization-scoped event totals and per-project/API-key breakdowns. It defaults to the trailing 30 days and accepts ISO-8601 `from` and `to` parameters for custom windows up to 90 days. Ingestion entitlements are enforced per API key using the organization’s Free, Pro, or Enterprise plan. The public `GET /api/plans` endpoint publishes the plan catalog. Organization admins can inspect API-key usage and plan entitlements in the workspace UI. The API-key console supports secure creation, one-time secret copying, metadata listing, revocation, and atomic rotation. Rotation revokes the old key and creates a replacement with preserved project scope and expiry in one audited transaction; the replacement secret is shown once. This is not payment processing or a subscription checkout system. See [API keys](docs/API-KEYS.md), [Usage metering](docs/USAGE-METERING.md), and [Subscription plans](docs/SUBSCRIPTION-PLANS.md).
 
-## Architecture
+## Observability\n\n- `GET /api/health` performs a live PostgreSQL readiness check and returns HTTP 503 with a sanitized response if the database is unavailable.\n- `GET /api/internal/metrics` exposes Prometheus text format gauges for organizations, projects, ingested events, active API keys, and open security alerts. It requires `Authorization: Bearer <OBSERVABILITY_TOKEN>`; use a random secret of at least 32 characters and keep it private.\n- Configure `OBSERVABILITY_TOKEN` in the application environment, then configure Prometheus or another scraper to poll `/api/internal/metrics` over HTTPS with the bearer header. Metrics are aggregate counts only; tenant-specific data and credentials are never exposed.\n\n## Architecture
 
 SignalForge currently follows a modular-monolith approach for its control plane. High-volume analytical infrastructure is part of the roadmap and is not represented as already deployed.
 
@@ -119,7 +119,7 @@ flowchart LR
 
 ## Dashboard concepts
 
-The following 12 screens illustrate the intended product experience and information architecture. They are original dashboard designs rendered as **PNG previews** from the source SVG files, presented in a **single vertical column** for reliable rendering in GitHub's web and mobile Markdown viewers. Source SVGs are retained alongside the PNGs. All figures, activity rows, and chart values are illustrative; these screens are not wired to live product data.
+The following 12 screens illustrate the intended product experience and information architecture. They are original dashboard designs rendered as **PNG previews** from the source SVG files, presented in a **single vertical column**. The README uses absolute `raw.githubusercontent.com` PNG URLs rather than relative repository paths to improve compatibility with GitHub's mobile and embedded Markdown viewers. Source SVGs are retained alongside the PNGs. All figures, activity rows, and chart values are illustrative; these screens are not wired to live product data.
 
 ### 01 · Executive overview
 A high-level workspace snapshot for activation, engagement, conversion, and overall product health.
