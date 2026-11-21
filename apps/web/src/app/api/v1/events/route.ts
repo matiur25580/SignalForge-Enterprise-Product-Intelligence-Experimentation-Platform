@@ -2,12 +2,9 @@ import { Prisma, ProjectEnvironment } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { authenticateIngestionKey } from "@/lib/ingestion-auth";
+import { INGESTION_LIMITS, reserveIngestionQuota } from "@/lib/ingestion-rate-limit";
 
 export const runtime = "nodejs";
-
-const MAX_REQUESTS_PER_MINUTE = 120;
-const MAX_EVENTS_PER_MINUTE = 10_000;
-const RATE_LIMIT_WINDOW_MS = 60_000;
 
 const eventSchema = z.object({
   eventId: z.string().trim().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/),
@@ -32,7 +29,7 @@ type RateLimitState = {
 
 function rateLimitHeaders(state: RateLimitState, resetAt: Date) {
   return {
-    "X-RateLimit-Limit": String(MAX_REQUESTS_PER_MINUTE),
+    "X-RateLimit-Limit": String(INGESTION_LIMITS.requestsPerMinute),
     "X-RateLimit-Remaining": String(state.remainingRequests),
     "X-RateLimit-Remaining-Events": String(state.remainingEvents),
     "X-RateLimit-Reset": String(Math.ceil(resetAt.getTime() / 1000)),
@@ -84,47 +81,19 @@ export async function POST(request: Request) {
 
     const receivedAt = new Date();
     const windowStart = new Date(
-      Math.floor(receivedAt.getTime() / RATE_LIMIT_WINDOW_MS) * RATE_LIMIT_WINDOW_MS,
+      Math.floor(receivedAt.getTime() / INGESTION_LIMITS.windowMs) * INGESTION_LIMITS.windowMs,
     );
-    const resetAt = new Date(windowStart.getTime() + RATE_LIMIT_WINDOW_MS);
+    const resetAt = new Date(windowStart.getTime() + INGESTION_LIMITS.windowMs);
 
     const result = await prisma.$transaction(async (tx) => {
-      // A single row per API key is atomically reset or incremented by PostgreSQL.
-      // The conditional conflict update prevents concurrent requests from overshooting either quota.
-      const quota = await tx.$queryRaw<RateLimitState[]>(Prisma.sql`
-        INSERT INTO "IngestionRateLimit"
-          ("apiKeyId", "windowStart", "requestCount", "eventCount", "updatedAt")
-        VALUES
-          (${apiKey.id}, ${windowStart}, 1, ${parsed.data.events.length}, ${receivedAt})
-        ON CONFLICT ("apiKeyId") DO UPDATE SET
-          "windowStart" = CASE
-            WHEN "IngestionRateLimit"."windowStart" < EXCLUDED."windowStart"
-            THEN EXCLUDED."windowStart"
-            ELSE "IngestionRateLimit"."windowStart"
-          END,
-          "requestCount" = CASE
-            WHEN "IngestionRateLimit"."windowStart" < EXCLUDED."windowStart"
-            THEN 1
-            ELSE "IngestionRateLimit"."requestCount" + 1
-          END,
-          "eventCount" = CASE
-            WHEN "IngestionRateLimit"."windowStart" < EXCLUDED."windowStart"
-            THEN EXCLUDED."eventCount"
-            ELSE "IngestionRateLimit"."eventCount" + EXCLUDED."eventCount"
-          END,
-          "updatedAt" = EXCLUDED."updatedAt"
-        WHERE "IngestionRateLimit"."windowStart" < EXCLUDED."windowStart"
-          OR (
-            "IngestionRateLimit"."windowStart" = EXCLUDED."windowStart"
-            AND "IngestionRateLimit"."requestCount" < ${MAX_REQUESTS_PER_MINUTE}
-            AND "IngestionRateLimit"."eventCount" + EXCLUDED."eventCount" <= ${MAX_EVENTS_PER_MINUTE}
-          )
-        RETURNING
-          ${MAX_REQUESTS_PER_MINUTE} - "requestCount" AS "remainingRequests",
-          ${MAX_EVENTS_PER_MINUTE} - "eventCount" AS "remainingEvents"
-      `);
+      const quota = await reserveIngestionQuota(
+        tx,
+        apiKey.id,
+        parsed.data.events.length,
+        receivedAt,
+      );
 
-      if (quota.length === 0) {
+      if (!quota) {
         return { limited: true as const };
       }
 
@@ -148,7 +117,7 @@ export async function POST(request: Request) {
         data: { lastUsedAt: receivedAt },
       });
 
-      return { limited: false as const, inserted, quota: quota[0] };
+      return { limited: false as const, inserted, quota };
     });
 
     if (result.limited) {
@@ -158,8 +127,8 @@ export async function POST(request: Request) {
           error: "Ingestion rate limit exceeded",
           retryAfterSeconds,
           limits: {
-            requestsPerMinute: MAX_REQUESTS_PER_MINUTE,
-            eventsPerMinute: MAX_EVENTS_PER_MINUTE,
+            requestsPerMinute: INGESTION_LIMITS.requestsPerMinute,
+            eventsPerMinute: INGESTION_LIMITS.eventsPerMinute,
           },
         },
         {
