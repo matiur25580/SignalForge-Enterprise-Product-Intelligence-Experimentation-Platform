@@ -10,7 +10,10 @@ export const runtime = "nodejs";
 const eventSchema = z.object({
   eventId: z.string().trim().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/),
   eventName: z.string().trim().min(1).max(128).regex(/^[A-Za-z0-9._:-]+$/),
-  timestamp: z.string().datetime().optional(),
+  timestamp: z.string().datetime().optional().refine(
+    (value) => value === undefined || Date.parse(value) <= Date.now() + 5 * 60 * 1000,
+    "Event timestamps cannot be more than five minutes in the future",
+  ),
   userId: z.string().trim().min(1).max(256).optional(),
   properties: z.record(z.string(), z.unknown()).default({}).refine(
     (value) => Object.keys(value).length <= 50,
