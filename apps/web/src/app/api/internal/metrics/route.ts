@@ -1,5 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { prisma } from "@/lib/prisma";
+import { renderHttpMetrics } from "@/lib/observability-runtime";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -39,7 +40,7 @@ export async function GET(request: Request) {
       metric("events_total", "Total ingested events stored.", events),
       metric("api_keys_active", "API keys that are not revoked or expired.", activeApiKeys),
       metric("security_alerts_open", "Currently open security alerts.", openSecurityAlerts),
-    ].join("");
+    ].join("") + renderHttpMetrics();
     return new Response(body, {
       status: 200,
       headers: { "Cache-Control": "no-store", "Content-Type": "text/plain; version=0.0.4; charset=utf-8" },
