@@ -26,6 +26,8 @@ Last updated: 2026-11-21
 
 ### Event ingestion and usage
 - [x] Strict, bounded batch event ingestion with project-scoped tenant checks
+- [x] Streaming request-body byte limit enforced before full buffering, with early Content-Length rejection and stream cancellation
+- [x] Invalid UTF-8 request bodies rejected before JSON parsing
 - [x] PostgreSQL event persistence and project/event idempotency
 - [x] Atomic per-API-key request and event quotas
 - [x] Free, Pro, and Enterprise organization plans with plan-specific ingestion entitlements
@@ -60,13 +62,8 @@ Last updated: 2026-11-21
 
 ## Verification
 
-The latest verified GitHub Actions run [44879418883](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44879418883) passed the application UI changes with 39 tests. Invitation email delivery, invitation acceptance UI, and key-rotation updates are awaiting the latest CI run. An earlier invitation email commit failed because of a malformed URL-normalization regex; that syntax issue has been corrected.
-- dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
-- Prisma Client generation and schema validation
-- all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
-- 39 automated tests across 10 test files in the last passing run (the rotation test suite was added afterward)
-- ESLint
-- TypeScript typecheck
-- Next.js production build
+The latest fully successful baseline before API-key rotation, invitation email delivery, invitation acceptance, and bounded request-body hardening is [44879418883](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44879418883). It passed clean PostgreSQL 16 migrations, all 39 automated tests, ESLint, TypeScript typecheck, and the Next.js production build.
 
-This validates the repository's CI environment, not production credentials, live OAuth configuration, email delivery, production infrastructure, or a deployed application. No production database migration or deployment has been performed.
+The bounded-body PR run [44880125429](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44880125429) installed dependencies, generated Prisma Client, validated the schema, and applied all four migrations. Its test run recorded 49 passed and 1 failed across 12 files; all five new bounded-reader tests passed. The remaining failure is in the concurrent invitation-delivery flow: `invitations/route.test.ts` expected HTTP 201 but received 500. The main-branch run [44880103995](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44880103995) reported the same invitation test failure (44 passed, 1 failed). Lint, typecheck, and build were skipped after the test failure, so the current change is not yet fully CI-verified.
+
+Rerun the full workflow after the invitation-delivery route/test failure is fixed. CI validates the repository's ephemeral test environment; it does not verify production credentials, live OAuth configuration, email delivery, production infrastructure, or a deployed application. No production database migration or deployment has been performed.

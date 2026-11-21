@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { authenticateIngestionKey } from "@/lib/ingestion-auth";
 import { INGESTION_LIMITS, reserveIngestionQuota, type IngestionQuotaLimits } from "@/lib/ingestion-rate-limit";
 import { getPlanIngestionLimits } from "@/lib/subscription-plans";
+import { MAX_REQUEST_BODY_BYTES, readBoundedRequestBody } from "@/lib/bounded-request-body";
 
 export const runtime = "nodejs";
 
@@ -38,14 +39,17 @@ function rateLimitHeaders(state: RateLimitState, resetAt: Date, limits: Ingestio
 }
 
 export async function POST(request: Request) {
-  const body = await request.text();
-  if (new TextEncoder().encode(body).byteLength > 256 * 1024) {
-    return Response.json({ error: "Request body exceeds the 256 KiB limit" }, { status: 413 });
+  const bodyResult = await readBoundedRequestBody(request, MAX_REQUEST_BODY_BYTES);
+  if (!bodyResult.ok) {
+    if (bodyResult.reason === "too_large") {
+      return Response.json({ error: "Request body exceeds the 256 KiB limit" }, { status: 413 });
+    }
+    return Response.json({ error: "Request body must be readable UTF-8" }, { status: 400 });
   }
 
   let input: unknown;
   try {
-    input = JSON.parse(body);
+    input = JSON.parse(bodyResult.body);
   } catch {
     return Response.json({ error: "Request body must be valid JSON" }, { status: 400 });
   }
