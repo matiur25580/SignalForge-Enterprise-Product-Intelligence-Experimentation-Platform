@@ -29,7 +29,6 @@ Last updated: 2026-11-21
 - [x] OWNER/ADMIN security alert center with audit-based detection, severity, deduplication, resolve/reopen lifecycle, and tenant-scoped API
 - [x] Protected scheduled security monitor endpoint with one-hour notification cooldown and optional Resend/Slack delivery
 - [x] GitHub Actions five-minute security-monitor schedule (requires app URL and monitor secret configuration)
-- [x] Protected scheduled security monitor endpoint with one-hour notification cooldown and optional Resend/Slack delivery
 - [x] GitHub Actions five-minute security-monitor schedule (requires app URL and monitor secret configuration)
 - [x] Invitation and member-management API tests
 - [x] Active-session API tests and session revocation safeguards
@@ -89,10 +88,10 @@ The repository contains 12 original SVG dashboard concepts under `docs/images/`.
 The CI workflow verifies clean PostgreSQL migrations, automated tests, lint, TypeScript, and a production build. The PostgreSQL-backed ingestion route integration suite was added after the last recorded passing test run; its result must be confirmed by a new CI run before it is considered verified. Do not treat an in-progress or failed run as a passing verification.
 - dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
 - Prisma Client generation and schema validation
-- all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
-- Security alert detection and route tests are committed; the new CI run must confirm the expanded suite, schema migration, lint, typecheck, and production build.
+- all committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
+- Security alert detection, scheduled monitor route tests, and notification migration are committed; the current CI run must confirm the expanded suite, schema migration, lint, typecheck, and production build.
 - ESLint
 - TypeScript typecheck
 - Next.js production build
 
-This validates the repository's CI environment, not production credentials, live OAuth configuration, email delivery, production infrastructure, or a deployed application. No production database migration or deployment has been performed.
+This validates the repository's CI environment, not production credentials, live OAuth configuration, email delivery, production infrastructure, or a deployed application. The scheduled monitor is not active until the application is deployed with its secret and the GitHub Actions repository variable/secret are configured. No production database migration or deployment has been performed.
