@@ -45,7 +45,7 @@ Last updated: 2026-11-21
 
 ## Not implemented yet
 
-- [ ] Dedicated invitee invitation acceptance UI and provider-delivery integration tests
+- [x] Dedicated invitee invitation acceptance UI with OAuth callback preservation and POST-based acceptance\n- [ ] Provider-delivery integration tests
 - [ ] Ownership transfer and owner lifecycle workflows
 - [ ] Local application setup and production runtime/database verification
 - [ ] Self-service key lifecycle policies and configurable rotation schedules
@@ -60,7 +60,7 @@ Last updated: 2026-11-21
 
 ## Verification
 
-The latest verified GitHub Actions run [44879418883](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44879418883) passed the application UI changes with 39 tests. Atomic API-key rotation, invitation email delivery, and their new code changes were added afterward; their CI verification is pending.
+The latest verified GitHub Actions run [44879418883](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44879418883) passed the application UI changes with 39 tests. Invitation email delivery, invitation acceptance UI, and key-rotation updates are awaiting the latest CI run. An earlier invitation email commit failed because of a malformed URL-normalization regex; that syntax issue has been corrected.
 - dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
 - Prisma Client generation and schema validation
 - all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
