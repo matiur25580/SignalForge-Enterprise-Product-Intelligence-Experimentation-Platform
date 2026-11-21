@@ -159,12 +159,13 @@ describe("POST /api/v1/events (PostgreSQL integration)", () => {
   });
 
   it("rejects invalid payloads before attempting database authentication", async () => {
+    const eventId = `invalid-${randomUUID()}`;
     const response = await POST(request({
-      ...batch(`invalid-${randomUUID()}`),
+      ...batch(eventId),
       unexpected: true,
     }));
 
     expect(response.status).toBe(400);
-    expect(await prisma.event.count({ where: { projectId } })).toBe(0);
+    expect(await prisma.event.count({ where: { projectId, eventId } })).toBe(0);
   });
 });
