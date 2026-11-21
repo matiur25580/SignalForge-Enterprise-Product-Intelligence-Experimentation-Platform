@@ -77,3 +77,11 @@ This is an initial security baseline, not a production security certification. A
 - `GET /api/internal/metrics` requires `Authorization: Bearer <OBSERVABILITY_TOKEN>`. The token must be at least 32 characters and is compared using constant-time equality.
 - Metrics are aggregate operational counts only (organizations, projects, events, active API keys, open security alerts); no tenant identifiers, user identifiers, secrets, or event properties are exposed.
 - Configure a high-entropy `OBSERVABILITY_TOKEN` in the application environment and restrict scraper access to trusted monitoring infrastructure over HTTPS.
+
+
+## Tracing and request metrics
+
+- Middleware propagates W3C `traceparent` and an `x-request-id` response/request header. Do not put secrets or personal data in trace baggage or custom span attributes.
+- Node instrumentation records HTTP method, normalized route, response status, and duration. Route identifiers are normalized to `:id` to reduce label cardinality.
+- Sampled server spans can be exported as OTLP/HTTP JSON to `OTEL_EXPORTER_OTLP_ENDPOINT`; optional collector headers are configured with `OTEL_EXPORTER_OTLP_HEADERS`. Protect collector endpoints and credentials, and use HTTPS outside trusted private networks.
+- Prometheus HTTP counters and latency histograms are in-process metrics. They reset on process restart and are not shared across serverless instances; use a scraper/collector that handles per-instance series and aggregation. The metrics endpoint remains protected by `OBSERVABILITY_TOKEN`.
