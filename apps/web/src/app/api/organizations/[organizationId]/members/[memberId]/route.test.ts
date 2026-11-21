@@ -1,5 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("@/lib/auth-rate-limit", () => ({
+  clientAddressFromHeaders: () => "203.0.113.10",
+  consumeSharedRateLimit: vi.fn().mockResolvedValue({ allowed: true, limit: 30, remaining: 29, retryAfterSeconds: 0 }),
+  MEMBER_MUTATION_RATE_LIMIT: { windowMs: 3600000, maxAttempts: 30 },
+  rateLimitResponse: (retry: number, limit: number) => Response.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(retry), "X-RateLimit-Limit": String(limit) } }),
+}));
+
+
 const mocks = vi.hoisted(() => ({
   requireMember: vi.fn(),
   findFirst: vi.fn(),
