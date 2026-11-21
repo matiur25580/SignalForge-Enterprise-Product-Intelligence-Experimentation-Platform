@@ -42,6 +42,7 @@ Last updated: 2026-11-21
 - [x] Organization usage dashboard with event breakdowns and current plan entitlement visibility
 - [x] Read-only plan comparison and billing overview with explicit payment-processing limitations
 - [x] PostgreSQL concurrency tests for quota enforcement
+- [x] PostgreSQL-backed event route integration tests for hashed-key authentication, expiry/revocation, tenant isolation, duplicate idempotency, persisted event scope, and invalid payloads
 
 ### Quality and documentation
 - [x] Vitest unit, route, and PostgreSQL integration test suites
@@ -72,11 +73,11 @@ Last updated: 2026-11-21
 
 The repository contains 12 original SVG dashboard concepts under `docs/images/`. The README embeds relative PNG previews generated from the 12 source SVGs. `.github/workflows/render-dashboard-previews.yml` regenerates all PNGs whenever a source SVG or renderer changes, and validates that all 12 outputs exist and are non-empty.
 
-The latest CI run is linked from the repository badge. The workflow verifies clean PostgreSQL migrations, automated tests, lint, TypeScript, and a production build. Do not treat an in-progress or failed run as a passing verification.
+The CI workflow verifies clean PostgreSQL migrations, automated tests, lint, TypeScript, and a production build. The PostgreSQL-backed ingestion route integration suite was added after the last recorded passing test run; its result must be confirmed by a new CI run before it is considered verified. Do not treat an in-progress or failed run as a passing verification.
 - dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
 - Prisma Client generation and schema validation
 - all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
-- 39 automated tests across 10 test files in the last passing run (the rotation test suite was added afterward)
+- 39 automated tests across 10 test files in the last previously recorded passing run; additional rotation and PostgreSQL ingestion route integration tests were added afterward and require fresh CI verification
 - ESLint
 - TypeScript typecheck
 - Next.js production build
