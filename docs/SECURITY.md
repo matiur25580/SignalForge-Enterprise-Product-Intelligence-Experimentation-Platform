@@ -5,6 +5,10 @@
 - Auth.js uses GitHub OAuth and a database-backed session adapter.
 - The session callback exposes the authenticated database user ID.
 - OAuth credentials are read only from environment variables.
+- Production Auth.js cookies are explicitly configured as secure, with HTTPS-only cookie behavior in production.
+- OAuth callback destinations are restricted to safe root-relative paths; protocol-relative, external, backslash, malformed-encoding, and control-character destinations fall back to the application root.
+- GitHub OAuth callback completion applies a second PostgreSQL-backed account-level limit of 10 authenticated sign-in callbacks per provider account in a 15-minute window. Provider account identifiers are hashed before persistence; the account check fails closed if its storage is unavailable.
+- Auth.js retains its built-in OAuth state/CSRF protections; the application does not disable or replace provider callback checks.
 - Request bodies are never trusted for user IDs, roles, or tenant membership.
 
 ## Tenant authorization
