@@ -42,7 +42,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 | Usage intelligence | Authenticated organization usage report with project and API-key breakdowns, dashboard summaries, and plan entitlement visibility |
 | Plan entitlements | Free, Pro, and Enterprise organization tiers with plan-specific atomic per-key ingestion quotas and a transparent plan comparison page |
 | Billing visibility | Current plan, tier comparison, usage and entitlement overview; payment processing is explicitly disabled |
-| Auditability | Transactional audit records for organization, project, and API-key lifecycle actions |
+| Auditability | Transactional audit records and a tenant-scoped organization activity timeline with cursor-paginated API |
 | Database delivery | Committed Prisma migrations applied against clean PostgreSQL in CI |
 | Quality gates | Vitest, ESLint, TypeScript checks, Prisma validation, and production build in GitHub Actions |
 
