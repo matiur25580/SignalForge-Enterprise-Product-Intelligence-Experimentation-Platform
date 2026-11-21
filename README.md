@@ -76,7 +76,7 @@ pnpm db:deploy     # Apply committed migrations
 pnpm db:studio     # Open Prisma Studio
 ```
 
-See [Database migrations](docs/DATABASE.md), [Identity API](docs/IDENTITY.md), [Security baseline](docs/SECURITY.md), [API keys](docs/API-KEYS.md), and [Event ingestion](docs/EVENT-INGESTION.md).
+See [Automated tests](docs/TESTING.md), [Database migrations](docs/DATABASE.md), [Identity API](docs/IDENTITY.md), [Security baseline](docs/SECURITY.md), [API keys](docs/API-KEYS.md), and [Event ingestion](docs/EVENT-INGESTION.md).
 
 ## Event ingestion
 
@@ -84,7 +84,7 @@ Send a batch to `POST /api/v1/events` with `Authorization: Bearer sf_live_<secre
 
 ## Verification status
 
-GitHub Actions validates the Prisma schema, applies committed migrations to an ephemeral PostgreSQL 16 service, then runs lint, typecheck, and a production build. Database-backed integration tests and production rollout are separate steps and are not implied by CI success.
+GitHub Actions runs the automated ingestion/authentication test suite, validates the Prisma schema, applies committed migrations to an ephemeral PostgreSQL 16 service, then runs lint, typecheck, and a production build. Database-backed integration tests and production rollout are separate steps and are not implied by CI success.
 
 ## Security
 
