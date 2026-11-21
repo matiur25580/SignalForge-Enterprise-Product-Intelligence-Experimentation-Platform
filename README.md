@@ -43,13 +43,13 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 | Plan entitlements | Free, Pro, and Enterprise organization tiers with plan-specific atomic per-key ingestion quotas and a transparent plan comparison page |
 | Billing visibility | Current plan, tier comparison, usage and entitlement overview; payment processing is explicitly disabled |
 | Account security | Private active-session inventory, current-session protection, one-way session identifiers, per-session remote revocation, and OAuth sign-in abuse protection |
-| Auditability | Transactional audit records and a tenant-scoped organization activity timeline with cursor-paginated API |
+| Auditability | Transactional audit records, tenant-scoped activity timeline, and OWNER/ADMIN security alerts for suspicious API-key, invitation, member-access, and ownership activity |
 | Database delivery | Committed Prisma migrations applied against clean PostgreSQL in CI |
 | Quality gates | Vitest, ESLint, TypeScript checks, Prisma validation, and production build in GitHub Actions |
 
 ### Team invitations
 
-Organization OWNERs can invite teammates as ADMIN, MEMBER, or VIEWER; ADMINs can invite MEMBER or VIEWER only. Invitation tokens are generated using cryptographically secure randomness, stored only as SHA-256 hashes, expire after seven days, and can be accepted only by a signed-in account with the matching email. Members can be listed, roles can be changed under a strict OWNER/ADMIN hierarchy, and non-owner members can be removed. The current OWNER can transfer ownership to an active organization member using an explicit typed confirmation; the previous owner becomes ADMIN and both role changes plus the audit event commit atomically. Acceptance, role changes, revocation, and removal are transactional and audited. When Resend credentials are configured, invitations are emailed with a single-use acceptance link and the raw token is not returned to the inviter. Without email credentials, the API provides a one-time manual acceptance URL. Invitees can open a dedicated acceptance page, sign in with the invited GitHub account, and accept the invitation directly. The page removes the token from the visible URL after hydration and submits it only in the POST body. Configure `RESEND_API_KEY`, `EMAIL_FROM`, and `AUTH_URL` to enable delivery. See [Team management](docs/TEAM-MANAGEMENT.md).
+Organization OWNERs can invite teammates as ADMIN, MEMBER, or VIEWER; ADMINs can invite MEMBER or VIEWER only. Invitation tokens are generated using cryptographically secure randomness, stored only as SHA-256 hashes, expire after seven days, and can be accepted only by a signed-in account with the matching email. Members can be listed, roles can be changed under a strict OWNER/ADMIN hierarchy, and non-owner members can be removed. The current OWNER can transfer ownership to an active organization member using an explicit typed confirmation; the previous owner becomes ADMIN and both role changes plus the audit event commit atomically. Acceptance, role changes, revocation, and removal are transactional and audited. When Resend credentials are configured, invitations are emailed with a single-use acceptance link and the raw token is not returned to the inviter. Without email credentials, the API provides a one-time manual acceptance URL. Invitees can open a dedicated acceptance page, sign in with the invited GitHub account, and accept the invitation directly. The page removes the token from the visible URL after hydration and submits it only in the POST body. Configure `RESEND_API_KEY`, `EMAIL_FROM`, and `AUTH_URL` to enable delivery. See [Team management](docs/TEAM-MANAGEMENT.md). Organization administrators can review deduplicated security alerts at `/organizations/:organizationId/security`; the current detector evaluates recent committed audit activity when the feed is opened, rather than running as a background monitor.
 
 ### Event ingestion contract
 
@@ -293,12 +293,13 @@ CI success verifies the checks in that workflow; it does not imply that a produc
 - [ ] Usage threshold notifications
 - [x] Invitation email delivery integration and invitee acceptance UI
 - [x] Organization activity timeline with tenant-scoped cursor pagination
+- [x] Audit-based security alert center with thresholds, severity, deduplication, and resolution workflow
 - [x] Secure ownership transfer with atomic role handoff and audit trail
 - [ ] Product SDKs and durable event transport
 - [ ] ClickHouse-backed funnels, journeys, cohorts, and retention
 - [ ] Feature flag evaluation and controlled rollouts
 - [ ] Experiment assignment, sample-ratio checks, and statistical readouts
-- [ ] Evidence-linked anomaly detection and AI-assisted product analysis
+- [ ] Background/real-time anomaly detection, alert notifications, and AI-assisted product analysis
 - [ ] Operational observability, integrations, and governance workflows
 
 ## Documentation
