@@ -57,7 +57,7 @@ Last updated: 2026-11-21
 
 ## Verification
 
-The latest verified baseline before the workspace UI changes is GitHub Actions run [44878608454](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44878608454), which passed all workflow stages and 39 automated tests. The newly added UI changes are awaiting their own CI verification.
+The latest GitHub Actions run [44878888794](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44878888794) passed after the workspace UI changes. It completed clean PostgreSQL 16 migrations, all 39 automated tests, ESLint, TypeScript typecheck, and the Next.js production build.
 - dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
 - Prisma Client generation and schema validation
 - all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
