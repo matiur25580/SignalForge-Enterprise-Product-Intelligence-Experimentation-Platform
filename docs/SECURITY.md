@@ -16,7 +16,7 @@
 - Organization APIs resolve the authenticated user before accessing tenant data.
 - Membership is queried using the composite organization/user key.
 - Project reads resolve the project's organization and then verify membership.
-- Project creation is restricted to organization owners and administrators.\n- Organization creation is limited to 3 attempts per hour per authenticated user and client address.\n- Project creation is limited to 20 attempts per hour per organization, member, and client address.\n- Administrative creation limits use the same atomic PostgreSQL fixed-window counter table as OAuth protection, with only keyed SHA-256 subject hashes stored.\n- Administrative creation routes fail closed with HTTP 503 when rate-limit storage is unavailable and return HTTP 429 with `Retry-After` when over quota.
+- Project creation is restricted to organization owners and administrators.\n- Organization creation is limited to 3 attempts per hour per authenticated user and client address.\n- Project creation is limited to 20 attempts per hour per organization, member, and client address.\n- API-key creation and invitation creation are each limited to 10 attempts per hour per organization member and client address.\n- Member role changes and removals are limited to 30 attempts per hour per organization member and client address.\n- Administrative creation and team mutation limits use the same atomic PostgreSQL fixed-window counter table as OAuth protection, with only keyed SHA-256 subject hashes stored.\n- Administrative creation routes fail closed with HTTP 503 when rate-limit storage is unavailable and return HTTP 429 with `Retry-After` when over quota.
 - Organization/project creation and audit events share a database transaction.
 
 ## Data model
