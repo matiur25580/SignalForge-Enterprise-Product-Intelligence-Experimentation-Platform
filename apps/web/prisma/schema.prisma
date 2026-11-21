@@ -104,6 +104,7 @@ model Project {
   environment    ProjectEnvironment @default(DEVELOPMENT)
   organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   apiKeys        ApiKey[]
+  events         Event[]
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
 
@@ -123,10 +124,31 @@ model ApiKey {
   revokedAt      DateTime?
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   project        Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  events         Event[]
   createdAt      DateTime     @default(now())
 
   @@index([organizationId, revokedAt])
   @@index([projectId, revokedAt])
+}
+
+model Event {
+  id          String             @id @default(cuid())
+  projectId   String
+  apiKeyId    String?
+  eventId     String
+  eventName   String
+  occurredAt  DateTime
+  receivedAt  DateTime           @default(now())
+  userId      String?
+  properties  Json
+  environment ProjectEnvironment
+  project     Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  apiKey      ApiKey?            @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+
+  @@unique([projectId, eventId])
+  @@index([projectId, eventName, occurredAt])
+  @@index([projectId, userId, occurredAt])
+  @@index([apiKeyId, receivedAt])
 }
 
 model AuditLog {
