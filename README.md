@@ -13,7 +13,7 @@
 ![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?logo=prisma)
 ![License](https://img.shields.io/badge/License-Not%20yet%20selected-lightgrey)
 
-[Architecture](#architecture) · [Capabilities](#implemented-capabilities) · [Dashboard concepts](#dashboard-concepts) · [Getting started](#getting-started) · [Roadmap](#roadmap)
+[Architecture](#architecture) · [Capabilities](#implemented-capabilities) · [Dashboard concepts](#dashboard-concepts) · [Activity timeline](docs/ACTIVITY-TIMELINE.md) · [Getting started](#getting-started) · [Roadmap](#roadmap)
 
 </div>
 
@@ -123,62 +123,62 @@ The following 12 screens illustrate the intended product experience and informat
 ### 01 · Executive overview
 A high-level workspace snapshot for activation, engagement, conversion, and overall product health.
 
-![SignalForge executive overview dashboard concept](docs/images/dashboard-01-executive-overview.svg)
+![SignalForge executive overview dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-01-executive-overview.svg)
 
 ### 02 · Event intelligence
 An operational view of event volume, accepted traffic, duplicate rates, and source health.
 
-![SignalForge event intelligence dashboard concept](docs/images/dashboard-02-event-intelligence.svg)
+![SignalForge event intelligence dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-02-event-intelligence.svg)
 
 ### 03 · Conversion funnels
 A focused analysis surface for conversion steps, drop-off points, and checkout performance.
 
-![SignalForge conversion funnels dashboard concept](docs/images/dashboard-03-conversion-funnels.svg)
+![SignalForge conversion funnels dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-03-conversion-funnels.svg)
 
 ### 04 · User journeys
 A journey exploration workspace for understanding common paths, key transitions, and exits.
 
-![SignalForge user journeys dashboard concept](docs/images/dashboard-04-user-journeys.svg)
+![SignalForge user journeys dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-04-user-journeys.svg)
 
 ### 05 · Cohorts & retention
 A retention view for comparing acquisition cohorts and tracking long-term engagement.
 
-![SignalForge cohorts and retention dashboard concept](docs/images/dashboard-05-cohorts-retention.svg)
+![SignalForge cohorts and retention dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-05-cohorts-retention.svg)
 
 ### 06 · Experimentation
 An experiment operations view for enrollment, outcome movement, and sample-ratio monitoring.
 
-![SignalForge experimentation dashboard concept](docs/images/dashboard-06-experimentation.svg)
+![SignalForge experimentation dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-06-experimentation.svg)
 
 ### 07 · Feature flags
 A release governance view for flag inventory, rollout coverage, and operational safety.
 
-![SignalForge feature flags dashboard concept](docs/images/dashboard-07-feature-flags.svg)
+![SignalForge feature flags dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-07-feature-flags.svg)
 
 ### 08 · Audience cohorts
 A segmentation workspace for defining behavioral audiences and understanding their size.
 
-![SignalForge audience cohorts dashboard concept](docs/images/dashboard-08-audience-cohorts.svg)
+![SignalForge audience cohorts dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-08-audience-cohorts.svg)
 
 ### 09 · Data quality
 A data observability concept for schema compliance, drift alerts, and event validation.
 
-![SignalForge data quality dashboard concept](docs/images/dashboard-09-data-quality.svg)
+![SignalForge data quality dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-09-data-quality.svg)
 
 ### 10 · Usage & quotas
 An organization consumption view for event volume, API-key activity, and quota awareness.
 
-![SignalForge usage and quotas dashboard concept](docs/images/dashboard-10-usage-quotas.svg)
+![SignalForge usage and quotas dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-10-usage-quotas.svg)
 
 ### 11 · API key security
 A credential administration concept for key lifecycle, expiry hygiene, and revocation review.
 
-![SignalForge API key security dashboard concept](docs/images/dashboard-11-api-key-security.svg)
+![SignalForge API key security dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-11-api-key-security.svg)
 
 ### 12 · Audit & governance
 An accountability view for administrative activity, policy checks, and review workflows.
 
-![SignalForge audit and governance dashboard concept](docs/images/dashboard-12-audit-governance.svg)
+![SignalForge audit and governance dashboard concept](https://raw.githubusercontent.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/main/docs/images/dashboard-12-audit-governance.svg)
 
 ## Technology stack
 
@@ -288,8 +288,10 @@ CI success verifies the checks in that workflow; it does not imply that a produc
 - [x] Authenticated workspace dashboard, organization creation, project registry, and team management UI
 - [x] Organization API-key console, usage dashboard, and read-only plan/billing overview
 - [ ] Payment-backed subscription lifecycle, self-service upgrades, and billing
-- [ ] API-key rotation workflow and usage threshold notifications
-- [ ] Invitation email delivery and invitee acceptance UI
+- [x] API-key rotation workflow
+- [ ] Usage threshold notifications
+- [x] Invitation email delivery integration and invitee acceptance UI
+- [x] Organization activity timeline with tenant-scoped cursor pagination
 - [ ] Product SDKs and durable event transport
 - [ ] ClickHouse-backed funnels, journeys, cohorts, and retention
 - [ ] Feature flag evaluation and controlled rollouts
@@ -302,6 +304,7 @@ CI success verifies the checks in that workflow; it does not imply that a produc
 - [Database migrations](docs/DATABASE.md)
 - [Identity and organization APIs](docs/IDENTITY.md)
 - [Team management and invitations](docs/TEAM-MANAGEMENT.md)
+- [Organization activity timeline](docs/ACTIVITY-TIMELINE.md)
 - [Security baseline](docs/SECURITY.md)
 - [API key lifecycle](docs/API-KEYS.md)
 - [Event ingestion contract](docs/EVENT-INGESTION.md)
