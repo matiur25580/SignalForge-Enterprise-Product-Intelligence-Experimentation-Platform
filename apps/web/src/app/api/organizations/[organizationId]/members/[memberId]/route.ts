@@ -76,6 +76,13 @@ export async function DELETE(request: Request, { params }: RouteContext) {
   try {
     const { organizationId, memberId } = await params;
     const { user, membership: actor } = await requireOrganizationMember(organizationId, ["OWNER", "ADMIN"]);
+    let limit;
+    try {
+      limit = await consumeSharedRateLimit(`member:mutate:${organizationId}:${user.id}:ip:${clientAddressFromHeaders(request.headers)}`, MEMBER_MUTATION_RATE_LIMIT);
+    } catch {
+      return Response.json({ error: "Member management is temporarily unavailable" }, { status: 503 });
+    }
+    if (!limit.allowed) return rateLimitResponse(limit.retryAfterSeconds, limit.limit);
     const target = await prisma.organizationMember.findFirst({
       where: { id: memberId, organizationId },
       select: { id: true, userId: true, role: true },
