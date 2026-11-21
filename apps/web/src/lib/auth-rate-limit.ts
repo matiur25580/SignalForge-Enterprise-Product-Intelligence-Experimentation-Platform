@@ -4,14 +4,25 @@ import { prisma } from "@/lib/prisma";
 export const AUTH_RATE_LIMIT = { windowMs: 15 * 60 * 1000, maxAttempts: 10 };
 type RateLimitRow = { requestCount: number; windowStartedAt: Date };
 
+export function hashRateLimitSubject(subject: string) {
+  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
+  if (!secret && process.env.NODE_ENV === "production") {
+    throw new Error("AUTH_SECRET is required for authentication rate limiting");
+  }
+  return createHash("sha256")
+    .update(secret ?? "local-development-auth-rate-limit-salt")
+    .update(":")
+    .update(subject)
+    .digest("hex");
+}
+
 export function hashClientAddress(address: string) {
-  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? "local-development-auth-rate-limit-salt";
-  return createHash("sha256").update(secret).update(":").update(address).digest("hex");
+  return hashRateLimitSubject(`ip:${address}`);
 }
 
 /** Shared fixed-window limiter; only a keyed digest of the client address is persisted. */
-export async function consumeAuthRateLimit(address: string, now = new Date()) {
-  const key = hashClientAddress(address);
+export async function consumeAuthRateLimit(subject: string, now = new Date()) {
+  const key = hashRateLimitSubject(subject);
   const expiresAt = new Date(now.getTime() + AUTH_RATE_LIMIT.windowMs * 2);
   const rows = await prisma.$queryRaw<RateLimitRow[]>`
     INSERT INTO "AuthRateLimit" ("key", "windowStartedAt", "requestCount", "expiresAt")
