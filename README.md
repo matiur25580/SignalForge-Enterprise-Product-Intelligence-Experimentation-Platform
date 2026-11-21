@@ -89,7 +89,7 @@ The endpoint validates the payload, verifies API-key scope and lifecycle state, 
 ## Observability
 
 - `GET /api/health` performs a live PostgreSQL readiness check and returns HTTP 503 with a sanitized response if the database is unavailable.
-- `GET /api/internal/metrics` exposes Prometheus text format gauges for organizations, projects, ingested events, active API keys, and open security alerts. It requires `Authorization: Bearer <OBSERVABILITY_TOKEN>`; use a random secret of at least 32 characters and keep it private.
+- `GET /api/internal/metrics` exposes Prometheus text format gauges for organizations, projects, ingested events, active API keys, open security alerts, plus process-local HTTP request counters, 5xx counts, and latency histograms. It requires `Authorization: Bearer <OBSERVABILITY_TOKEN>`; use a random secret of at least 32 characters and keep it private. HTTP metrics are process-local and reset on instance restart; aggregate them across instances in your scraper rather than treating them as durable totals.\n- Middleware propagates W3C `traceparent` and `x-request-id` headers. Node instrumentation records request spans and exports sampled traces using OTLP/HTTP JSON when `OTEL_EXPORTER_OTLP_ENDPOINT` is configured. Set optional `OTEL_EXPORTER_OTLP_HEADERS`, `OTEL_SERVICE_NAME`, and `OTEL_TRACES_SAMPLE_RATE` for your collector. Without an endpoint, tracing context and local metrics still work, but traces are not exported.
 - Configure `OBSERVABILITY_TOKEN` in the application environment, then configure Prometheus or another scraper to poll `/api/internal/metrics` over HTTPS with the bearer header. Metrics are aggregate counts only; tenant-specific data and credentials are never exposed.
 
 ## Architecture
