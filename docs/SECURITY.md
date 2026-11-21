@@ -31,6 +31,7 @@
 - Project slugs are unique within an organization.
 - API key records are designed to store a hash and non-secret prefix only.
 - Audit records are organization-scoped and indexed by time.
+- Security alerts are organization-scoped, deduplicated by actor and signal type, and retain only the alert summary, severity, event count, and timestamps.
 
 ## Authentication abuse protection
 
@@ -40,6 +41,13 @@
 - Expired buckets are pruned opportunistically during limiter requests.
 - Requests over the limit receive HTTP 429 with `Retry-After` and rate-limit headers. If the limiter database is unavailable, sign-in initiation fails closed with HTTP 503 or a retry notice rather than silently bypassing protection.
 - The migration creates `AuthRateLimit`; deploy the database migration before running the updated application. This single table backs authentication and administrative operation limits.
+
+## Suspicious activity detection
+
+- OWNER and ADMIN members can review alerts at `/organizations/:organizationId/security` and through `GET /api/organizations/:organizationId/security-alerts`.
+- Detection evaluates committed audit events from the trailing 15 minutes: five API-key lifecycle changes per actor (HIGH), five invitation creations/resends per actor (MEDIUM), three member role changes/removals per actor (HIGH), or any ownership transfer (CRITICAL).
+- Alerts are deduplicated by organization, signal type, and actor. New evidence after resolution reopens the alert; resolving an alert is tenant-scoped and restricted to OWNER/ADMIN.
+- The alert feed intentionally omits raw audit metadata, invitation addresses, credential material, and event payloads. Detection runs when an authorized administrator opens or refreshes the alert feed; it is not a background/real-time monitoring worker.
 
 ## Active session controls
 
