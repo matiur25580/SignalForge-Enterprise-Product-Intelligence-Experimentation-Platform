@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@/lib/tenant", () => ({
   requireOrganizationMember: mocks.requireMember,
-  apiError: (error: unknown) => Response.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: 500 }),
+  apiError: (error: unknown) => Response.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: error instanceof Error && error.message.includes("role cannot") ? 403 : 500 }),
 }));
 vi.mock("@/lib/prisma", () => ({
   prisma: { organizationMember: { findFirst: mocks.findFirst }, $transaction: mocks.transaction },
@@ -19,7 +19,7 @@ vi.mock("@/lib/prisma", () => ({
 import { POST } from "@/app/api/organizations/[organizationId]/ownership-transfer/route";
 
 const context = { params: Promise.resolve({ organizationId: "org_1" }) };
-const body = { targetMemberId: "clxxxxxxxxxxxxxxxxxxxxxxxxx", confirmation: "TRANSFER OWNERSHIP" };
+const body = { targetMemberId: "clh3am9q0000008l5g7f2p1x9", confirmation: "TRANSFER OWNERSHIP" };
 
 describe("organization ownership transfer", () => {
   beforeEach(() => {
