@@ -105,7 +105,7 @@ export async function POST(request: Request, { params }: RouteContext) {
       select: { name: true },
     });
     const baseUrl = process.env.NEXTAUTH_URL ?? process.env.AUTH_URL;
-    const acceptanceUrl = `${baseUrl?.replace(/\\/$/, "") ?? "http://localhost:3000"}/invitations/accept?token=${encodeURIComponent(generated.secret)}`;
+    const acceptanceUrl = `${baseUrl?.replace(/\/$/, "") ?? "http://localhost:3000"}/invitations/accept?token=${encodeURIComponent(generated.secret)}`;
 
     try {
       const delivery = await sendOrganizationInvitationEmail({
