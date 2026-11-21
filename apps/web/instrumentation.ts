@@ -35,11 +35,11 @@ function exportSpan(state: RequestState, status: number, durationNs: bigint) {
   const endpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
   if (!endpoint || !state.sampled || !state.traceId) return;
   const spanId = randomBytes(8).toString("hex");
-  const startNs = process.hrtime.bigint() - durationNs;
+  const startNs = BigInt(Date.now()) * 1_000_000n - durationNs;
   const attributes = [
     { key: "http.request.method", value: { stringValue: state.method } },
     { key: "url.path", value: { stringValue: state.pathname } },
-    { key: "http.response.status_code", value: { intValue: status } },
+    { key: "http.response.status_code", value: { intValue: String(status) } },
     { key: "server.address", value: { stringValue: process.env.OTEL_SERVICE_NAME || "signalforge-web" } },
   ];
   const payload = {
@@ -84,7 +84,8 @@ function exportSpan(state: RequestState, status: number, durationNs: bigint) {
 export async function register() {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
 
-  channel("http.server.request.start").subscribe((message: { request?: IncomingRequest; response?: object }) => {
+  channel("http.server.request.start").subscribe((raw: unknown) => {
+    const message = raw as { request?: IncomingRequest; response?: object };
     const request = message.request;
     const response = message.response;
     if (!request || !response) return;
@@ -102,7 +103,8 @@ export async function register() {
     });
   });
 
-  channel("http.server.response.finish").subscribe((message: { request?: IncomingRequest; response?: ServerResponse & object }) => {
+  channel("http.server.response.finish").subscribe((raw: unknown) => {
+    const message = raw as { request?: IncomingRequest; response?: ServerResponse & object };
     const response = message.response;
     if (!response) return;
     const state = active.get(response);
