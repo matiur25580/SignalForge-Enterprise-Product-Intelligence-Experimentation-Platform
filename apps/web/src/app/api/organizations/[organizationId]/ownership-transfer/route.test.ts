@@ -53,7 +53,7 @@ describe("organization ownership transfer", () => {
   it("rejects non-owners before looking up the target", async () => {
     mocks.requireMember.mockRejectedValue(new Error("Your organization role cannot perform this action"));
     const response = await POST(new Request("http://localhost", { method: "POST", body: JSON.stringify(body) }), context);
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(403);
     expect(mocks.findFirst).not.toHaveBeenCalled();
   });
 
