@@ -15,7 +15,7 @@ Last updated: 2026-11-21
 - [x] Transactional audit records for organization and project lifecycle actions
 
 ### Identity, security, and team management
-- [x] API key issuance with cryptographically random secrets, hash-only persistence, one-time display, expiry, listing, and revocation
+- [x] API key issuance with cryptographically random secrets, hash-only persistence, one-time display, expiry, listing, revocation, and atomic audited rotation
 - [x] Hash-based ingestion authentication with expiry and revocation checks
 - [x] Organization member directory
 - [x] Secure invitation creation, reissue, seven-day expiry, single-use acceptance, and revocation
@@ -48,7 +48,7 @@ Last updated: 2026-11-21
 - [ ] Automatic invitation email delivery and invitee invitation acceptance UI
 - [ ] Ownership transfer and owner lifecycle workflows
 - [ ] Local application setup and production runtime/database verification
-- [ ] Atomic one-click API-key rotation endpoint and self-service key lifecycle policies
+- [ ] Self-service key lifecycle policies and configurable rotation schedules
 - [ ] Payment-backed subscription lifecycle, checkout, invoices, and billing
 - [ ] Product SDKs, durable event transport, and downstream consumers
 - [ ] ClickHouse-backed analytical queries
@@ -60,11 +60,11 @@ Last updated: 2026-11-21
 
 ## Verification
 
-The latest GitHub Actions run [44879418883](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44879418883) passed after the API-key, usage, and billing UI changes. It completed clean PostgreSQL 16 migrations, all 39 automated tests, ESLint, TypeScript typecheck, and the Next.js production build.
+The latest verified GitHub Actions run [44879418883](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44879418883) passed the application UI changes with 39 tests. Atomic API-key rotation and its new route tests were added afterward; their CI verification is pending.
 - dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
 - Prisma Client generation and schema validation
 - all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
-- all 39 automated tests across 10 test files
+- 39 automated tests across 10 test files in the last passing run (the rotation test suite was added afterward)
 - ESLint
 - TypeScript typecheck
 - Next.js production build
