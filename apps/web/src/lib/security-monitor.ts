@@ -1,8 +1,9 @@
-import { timingSafeEqual } from "node:crypto";
+import { randomUUID, timingSafeEqual } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { evaluateSecurityAlerts } from "@/lib/security-alerts";
 
 const NOTIFICATION_COOLDOWN_MS = 60 * 60 * 1000;
+const NOTIFICATION_CLAIM_STALE_MS = 5 * 60 * 1000;
 
 function secretMatches(expected: string, supplied: string | null) {
   if (!supplied) return false;
@@ -14,7 +15,7 @@ function secretMatches(expected: string, supplied: string | null) {
 export function isAuthorizedSecurityMonitor(request: Request) {
   const secret = process.env.SECURITY_MONITOR_SECRET;
   if (!secret || secret.length < 32) return false;
-  return secretMatches(secret, request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? null);
+  return secretMatches(secret, request.headers.get("authorization")?.replace(/^Bearer\\s+/i, "") ?? null);
 }
 
 async function sendNotifications(input: {
@@ -60,7 +61,14 @@ async function sendNotifications(input: {
   return true;
 }
 
-/** Called by a protected scheduler endpoint; notifications are throttled per alert. */
+async function releaseNotificationClaim(organizationId: string, claimToken: string) {
+  await prisma.securityAlert.updateMany({
+    where: { organizationId, notificationClaimToken: claimToken },
+    data: { notificationClaimedAt: null, notificationClaimToken: null },
+  });
+}
+
+/** Called by a protected scheduler endpoint; atomic claims prevent overlapping runs from duplicating notifications. */
 export async function runSecurityMonitor(now = new Date()) {
   const organizations = await prisma.organization.findMany({
     select: { id: true, name: true },
@@ -72,33 +80,64 @@ export async function runSecurityMonitor(now = new Date()) {
   for (const organization of organizations) {
     await evaluateSecurityAlerts(organization.id, now);
     evaluated += 1;
-    const alerts = await prisma.securityAlert.findMany({
+
+    const claimToken = randomUUID();
+    const claim = await prisma.securityAlert.updateMany({
       where: {
         organizationId: organization.id,
         status: "OPEN",
         severity: { in: ["HIGH", "CRITICAL"] },
-        OR: [{ lastNotifiedAt: null }, { lastNotifiedAt: { lt: new Date(now.getTime() - NOTIFICATION_COOLDOWN_MS) } }],
+        OR: [
+          { lastNotifiedAt: null },
+          { lastNotifiedAt: { lt: new Date(now.getTime() - NOTIFICATION_COOLDOWN_MS) } },
+        ],
+        AND: [{
+          OR: [
+            { notificationClaimedAt: null },
+            { notificationClaimedAt: { lt: new Date(now.getTime() - NOTIFICATION_CLAIM_STALE_MS) } },
+          ],
+        }],
+      },
+      data: { notificationClaimedAt: now, notificationClaimToken: claimToken },
+    });
+    if (!claim.count) continue;
+
+    const alerts = await prisma.securityAlert.findMany({
+      where: {
+        organizationId: organization.id,
+        status: "OPEN",
+        notificationClaimToken: claimToken,
       },
       select: { id: true, type: true, severity: true, summary: true, occurrenceCount: true },
       orderBy: [{ severity: "desc" }, { lastSeenAt: "desc" }],
       take: 25,
     });
-    if (!alerts.length) continue;
+    if (!alerts.length) {
+      await releaseNotificationClaim(organization.id, claimToken);
+      continue;
+    }
 
-    const members = await prisma.organizationMember.findMany({
-      where: { organizationId: organization.id, role: { in: ["OWNER", "ADMIN"] } },
-      select: { user: { select: { email: true } } },
-    });
-    const recipients = [...new Set(members.map((member) => member.user.email).filter((email): email is string => Boolean(email)))];
-    const delivered = await sendNotifications({ organizationName: organization.name, alerts, recipients });
-    if (!delivered) continue;
+    try {
+      const members = await prisma.organizationMember.findMany({
+        where: { organizationId: organization.id, role: { in: ["OWNER", "ADMIN"] } },
+        select: { user: { select: { email: true } } },
+      });
+      const recipients = [...new Set(members.map((member) => member.user.email).filter((email): email is string => Boolean(email)))];
+      const delivered = await sendNotifications({ organizationName: organization.name, alerts, recipients });
+      if (!delivered) {
+        await releaseNotificationClaim(organization.id, claimToken);
+        continue;
+      }
 
-    const deliveredAt = now;
-    const result = await prisma.securityAlert.updateMany({
-      where: { id: { in: alerts.map((alert) => alert.id) }, organizationId: organization.id, status: "OPEN" },
-      data: { lastNotifiedAt: deliveredAt },
-    });
-    notified += result.count;
+      const result = await prisma.securityAlert.updateMany({
+        where: { organizationId: organization.id, notificationClaimToken: claimToken, status: "OPEN" },
+        data: { lastNotifiedAt: now, notificationClaimedAt: null, notificationClaimToken: null },
+      });
+      notified += result.count;
+    } catch (error) {
+      await releaseNotificationClaim(organization.id, claimToken);
+      throw error;
+    }
   }
 
   return { organizationsEvaluated: evaluated, alertsNotified: notified };
