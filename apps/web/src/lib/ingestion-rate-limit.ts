@@ -28,6 +28,10 @@ export async function reserveIngestionQuota(
   receivedAt: Date,
   limits: IngestionQuotaLimits = INGESTION_LIMITS,
 ): Promise<IngestionQuotaState | null> {
+  if (eventCount > limits.eventsPerMinute || limits.requestsPerMinute < 1) {
+    return null;
+  }
+
   const windowStart = new Date(
     Math.floor(receivedAt.getTime() / INGESTION_LIMITS.windowMs) * INGESTION_LIMITS.windowMs,
   );
