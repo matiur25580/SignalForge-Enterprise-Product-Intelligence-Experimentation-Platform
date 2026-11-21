@@ -29,6 +29,7 @@ const activeKey = {
   projectId: null as string | null,
   expiresAt: null,
   revokedAt: null,
+  organization: { plan: "FREE" as "FREE" | "PRO" | "ENTERPRISE" },
 };
 
 function makeRequest(body: unknown) {
@@ -98,6 +99,22 @@ describe("POST /api/v1/events", () => {
       where: { id: "key_1" },
       data: { lastUsedAt: expect.any(Date) },
     });
+  });
+
+
+  it("applies the higher request and event limits for a Pro organization", async () => {
+    mocks.authenticate.mockResolvedValue({
+      ok: true,
+      apiKey: { ...activeKey, organization: { plan: "PRO" } },
+    });
+    mocks.queryRaw.mockResolvedValue([{ remainingRequests: 599, remainingEvents: 49_999 }]);
+    const response = await POST(makeRequest(validBatch()));
+
+    expect(response.status).toBe(202);
+    expect(response.headers.get("x-ratelimit-limit")).toBe("600");
+    expect(response.headers.get("x-ratelimit-remaining")).toBe("599");
+    expect(response.headers.get("x-ratelimit-remaining-events")).toBe("49999");
+    expect(mocks.queryRaw).toHaveBeenCalledTimes(1);
   });
 
   it("returns the number of duplicate event IDs skipped by storage", async () => {
