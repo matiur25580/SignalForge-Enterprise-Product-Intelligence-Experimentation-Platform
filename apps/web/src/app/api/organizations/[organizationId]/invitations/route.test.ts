@@ -98,7 +98,14 @@ describe("organization invitation collection", () => {
     expect(mocks.transaction).not.toHaveBeenCalled();
   });
 
-  it("does not invite an existing organization member", async () => {
+
+  it("prevents administrators from inviting another administrator", async () => {
+    mocks.requireMember.mockResolvedValue({ user: { id: "admin_1" }, membership: { role: "ADMIN" } });
+    const response = await POST(request({ email: "admin2@example.com", role: "ADMIN" }), params);
+    expect(response.status).toBe(403);
+    expect(mocks.transaction).not.toHaveBeenCalled();
+  });
+\n  it("does not invite an existing organization member", async () => {
     mocks.findFirstMember.mockResolvedValue({ id: "member_1" });
     const response = await POST(request({ email: "analyst@example.com" }), params);
     expect(response.status).toBe(409);
