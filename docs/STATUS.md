@@ -28,8 +28,10 @@ Last updated: 2026-11-21
 - [x] Organization activity timeline page and tenant-scoped cursor-paginated audit API
 - [x] Invitation and member-management API tests
 - [x] Active-session API tests and session revocation safeguards
-- [x] OAuth sign-in abuse protection: 10 attempts per client address per 15-minute window, shared PostgreSQL counters, and privacy-preserving hashed client keys
+- [x] OAuth sign-in abuse protection: 10 attempts per client address and authenticated provider account per 15-minute window, shared PostgreSQL counters, privacy-preserving hashed subject keys, and expired-bucket cleanup
+- [x] OAuth callback URL validation, production Secure cookies, and account-level callback throttling
 - [x] Rate-limit tests for threshold behavior, retry timing, and client-address hashing
+- [x] OAuth account-protection and safe callback URL test coverage
 
 ### Event ingestion and usage
 - [x] Strict, bounded batch event ingestion with project-scoped tenant checks
