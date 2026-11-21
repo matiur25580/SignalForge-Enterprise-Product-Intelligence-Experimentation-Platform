@@ -29,4 +29,4 @@ Requires OWNER or ADMIN role. Revocation is soft and auditable. Revoked keys rem
 - The raw secret is prefixed with sf_live_.
 - Only a SHA-256 hash and a short prefix are persisted.
 - Key secrets must not be logged, committed, or sent to analytics.
-- API-key authentication middleware and usage tracking are a separate follow-up milestone.
+- The ingestion endpoint now authenticates these keys by hash and updates last-used metadata after successful batch processing. See [Event ingestion](./EVENT-INGESTION.md) for the request contract.
