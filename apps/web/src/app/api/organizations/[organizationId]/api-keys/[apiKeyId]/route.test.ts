@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@/lib/tenant", () => ({
   requireOrganizationMember: mocks.requireMember,
-  apiError: (error: unknown) => Response.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: 500 }),
+  apiError: (error: unknown) => Response.json({ error: error instanceof Error ? error.message : "Internal server error" }, { status: error instanceof Error && error.message === "Forbidden" ? 403 : 500 }),
 }));
 vi.mock("@/lib/prisma", () => ({
   prisma: {
@@ -72,7 +72,7 @@ describe("API key rotation", () => {
   it("requires an owner or administrator", async () => {
     mocks.requireMember.mockRejectedValue(new Error("Forbidden"));
     const response = await POST(new Request("http://localhost"), context);
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(403);
     expect(mocks.transaction).not.toHaveBeenCalled();
   });
 
