@@ -28,7 +28,9 @@ Last updated: 2026-11-21
 - [x] Organization activity timeline page and tenant-scoped cursor-paginated audit API
 - [x] OWNER/ADMIN security alert center with audit-based detection, severity, deduplication, resolve/reopen lifecycle, and tenant-scoped API
 - [x] Protected scheduled security monitor endpoint with one-hour notification cooldown and optional Resend/Slack delivery
-- [x] GitHub Actions five-minute security-monitor schedule (requires app URL and monitor secret configuration)\n- [x] Protected scheduled security monitor endpoint with one-hour notification cooldown and optional Resend/Slack delivery\n- [x] GitHub Actions five-minute security-monitor schedule (requires app URL and monitor secret configuration)
+- [x] GitHub Actions five-minute security-monitor schedule (requires app URL and monitor secret configuration)
+- [x] Protected scheduled security monitor endpoint with one-hour notification cooldown and optional Resend/Slack delivery
+- [x] GitHub Actions five-minute security-monitor schedule (requires app URL and monitor secret configuration)
 - [x] Invitation and member-management API tests
 - [x] Active-session API tests and session revocation safeguards
 - [x] OAuth sign-in abuse protection: 10 attempts per client address and authenticated provider account per 15-minute window, shared PostgreSQL counters, privacy-preserving hashed subject keys, and expired-bucket cleanup
