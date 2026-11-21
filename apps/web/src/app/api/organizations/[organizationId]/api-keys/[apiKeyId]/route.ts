@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { generateApiKey } from "@/lib/api-keys";
 import { apiError, requireOrganizationMember } from "@/lib/tenant";
 
 type RouteContext = {
