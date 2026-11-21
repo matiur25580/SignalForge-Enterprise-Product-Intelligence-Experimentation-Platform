@@ -17,6 +17,7 @@ model User {
   sessions      Session[]
   memberships   OrganizationMember[]
   auditEvents   AuditLog[] @relation("AuditActor")
+  invitationsSent OrganizationInvitation[] @relation("InvitationSender")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -84,6 +85,7 @@ model Organization {
   projects    Project[]
   apiKeys     ApiKey[]
   auditLogs   AuditLog[]
+  invitations OrganizationInvitation[]
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @updatedAt
 }
@@ -137,6 +139,27 @@ model ApiKey {
 
   @@index([organizationId, revokedAt])
   @@index([projectId, revokedAt])
+}
+
+
+model OrganizationInvitation {
+  id             String       @id @default(cuid())
+  organizationId String
+  email          String
+  role           OrganizationRole
+  tokenHash      String       @unique
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  revokedAt      DateTime?
+  invitedById    String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy      User         @relation("InvitationSender", fields: [invitedById], references: [id], onDelete: Restrict)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, email])
+  @@index([organizationId, acceptedAt, revokedAt, expiresAt])
+  @@index([email, expiresAt])
 }
 
 model Event {
