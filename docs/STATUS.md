@@ -61,7 +61,11 @@ Last updated: 2026-11-21
 - [x] GitHub Actions CI for clean PostgreSQL migration, tests, lint, typecheck, and production build
 - [x] Architecture, security, API, database, usage, team-management, and testing documentation
 - [x] Twelve original conceptual dashboard previews embedded as PNG for GitHub mobile compatibility, with source SVGs retained
-- [x] Automated SVG-to-PNG rendering workflow and deterministic conversion script\n- [x] README dashboard previews switched to absolute raw.githubusercontent.com PNG URLs for mobile/embedded Markdown compatibility\n- [x] Database readiness endpoint and protected Prometheus-compatible aggregate metrics endpoint with route tests
+- [x] Automated SVG-to-PNG rendering workflow and deterministic conversion script
+- [x] README dashboard previews switched to absolute raw.githubusercontent.com PNG URLs for mobile/embedded Markdown compatibility
+- [x] Database readiness endpoint and protected Prometheus-compatible aggregate and HTTP runtime metrics endpoint with route tests
+- [x] W3C trace context propagation, Node HTTP server spans, configurable OTLP/HTTP JSON export, and request ID response headers
+- [x] Process-local Prometheus request counters, 5xx counters, and latency histograms with normalized route labels and unit tests
 
 ## Not implemented yet
 
@@ -78,7 +82,7 @@ Last updated: 2026-11-21
 - [ ] Feature flag evaluation and experimentation assignment
 - [ ] Statistical experiment analysis and sample-ratio monitoring
 - [ ] AI analyst, anomaly detection, and evidence-linked recommendations
-- [ ] Distributed tracing, request latency/error-rate instrumentation, dashboards, and external alerting integrations
+- [ ] Centralized dashboards, durable cross-instance metrics aggregation, and alerting policies
 
 ## Verification
 
