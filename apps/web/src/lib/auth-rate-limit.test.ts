@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ queryRaw: vi.fn() }));
 vi.mock("@/lib/prisma", () => ({ prisma: { $queryRaw: mocks.queryRaw } }));
 
-import { AUTH_RATE_LIMIT, clientAddressFromHeaders, consumeAuthRateLimit, hashClientAddress } from "@/lib/auth-rate-limit";
+import { AUTH_RATE_LIMIT, clientAddressFromHeaders, consumeAuthRateLimit, consumeSharedRateLimit, hashClientAddress, ORGANIZATION_CREATE_RATE_LIMIT, PROJECT_CREATE_RATE_LIMIT } from "@/lib/auth-rate-limit";
 
 describe("authentication rate limiting", () => {
   beforeEach(() => vi.clearAllMocks());
@@ -24,7 +24,7 @@ describe("authentication rate limiting", () => {
     expect(AUTH_RATE_LIMIT.maxAttempts).toBe(10);
   });
 
-  it("hashes client addresses instead of exposing them in stored keys", () => {
+  it("supports separate operation policies without changing the auth policy", async () => {\n    mocks.queryRaw.mockResolvedValue([{ requestCount: 4, windowStartedAt: new Date("2026-11-21T10:00:00.000Z") }]);\n    const result = await consumeSharedRateLimit("organization:create:user_1", ORGANIZATION_CREATE_RATE_LIMIT, new Date("2026-11-21T10:01:00.000Z"));\n    expect(result).toMatchObject({ allowed: false, limit: 3, remaining: 0 });\n    expect(ORGANIZATION_CREATE_RATE_LIMIT.windowMs).toBe(60 * 60 * 1000);\n    expect(PROJECT_CREATE_RATE_LIMIT.maxAttempts).toBe(20);\n  });\n\n  it("rejects invalid rate-limit policies before touching storage", async () => {\n    await expect(consumeSharedRateLimit("bad-policy", { windowMs: 0, maxAttempts: 1 })).rejects.toThrow("Invalid rate limit policy");\n    expect(mocks.queryRaw).not.toHaveBeenCalled();\n  });\n\n  it("hashes client addresses instead of exposing them in stored keys", () => {
     const first = hashClientAddress("203.0.113.10");
     expect(first).toMatch(/^[a-f0-9]{64}$/);
     expect(first).not.toContain("203.0.113.10");
