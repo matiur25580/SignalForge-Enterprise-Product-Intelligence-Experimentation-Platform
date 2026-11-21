@@ -22,6 +22,7 @@ Last updated: 2026-11-21
 - [x] Optional Resend email delivery with a one-time manual-link fallback and no raw-token disclosure when email is sent
 - [x] Invitation tokens stored as SHA-256 hashes and bound to the authenticated account email
 - [x] OWNER/ADMIN role hierarchy for member role changes and member removal
+- [x] OWNER-only ownership transfer with typed confirmation, concurrency guards, atomic role changes, and audit trail
 - [x] Transactional audit records for invitation and membership lifecycle actions
 - [x] Organization activity timeline page and tenant-scoped cursor-paginated audit API
 - [x] Invitation and member-management API tests
@@ -49,7 +50,8 @@ Last updated: 2026-11-21
 
 - [x] Dedicated invitee invitation acceptance UI with OAuth callback preservation and POST-based acceptance
 - [ ] Provider-delivery integration tests
-- [ ] Ownership transfer and owner lifecycle workflows
+- [x] Secure OWNER-only ownership transfer to an active member with transactional role handoff and audit logging
+- [ ] Additional owner lifecycle workflows
 - [ ] Local application setup and production runtime/database verification
 - [ ] Self-service key lifecycle policies and configurable rotation schedules
 - [ ] Payment-backed subscription lifecycle, checkout, invoices, and billing
