@@ -35,11 +35,11 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 | Multi-tenancy | Organizations, memberships, roles, and server-side access checks |
 | Team management | Secure email-bound invitations, member directory, role administration, guarded removal, single-use acceptance, revocation, audit trail, and interactive team UI |\n| Workspace UI | Authenticated organization dashboard, workspace creation, project registry, team administration, and invitation token handling |
 | Projects | Organization-scoped project creation and listing |
-| API credentials | Cryptographically random secrets, SHA-256 hash-only storage, one-time display, expiry, and revocation |
+| API credentials | Cryptographically random secrets, SHA-256 hash-only storage, one-time display, expiry, revocation, and interactive organization key console |
 | Event ingestion | Strictly validated batch endpoint, bounded payloads, server-derived environment, and duplicate protection |
 | Rate limiting | Atomic PostgreSQL per-key limits: 120 requests and 10,000 submitted events per minute |
-| Usage intelligence | Authenticated organization usage report with project and API-key breakdowns |
-| Plan entitlements | Free, Pro, and Enterprise organization tiers with plan-specific atomic per-key ingestion quotas |
+| Usage intelligence | Authenticated organization usage report with project and API-key breakdowns, dashboard summaries, and plan entitlement visibility |
+| Plan entitlements | Free, Pro, and Enterprise organization tiers with plan-specific atomic per-key ingestion quotas and a transparent plan comparison page |\n| Billing visibility | Current plan, tier comparison, usage and entitlement overview; payment processing is explicitly disabled |
 | Auditability | Transactional audit records for organization, project, and API-key lifecycle actions |
 | Database delivery | Committed Prisma migrations applied against clean PostgreSQL in CI |
 | Quality gates | Vitest, ESLint, TypeScript checks, Prisma validation, and production build in GitHub Actions |
@@ -80,7 +80,7 @@ The endpoint validates the payload, verifies API-key scope and lifecycle state, 
 
 ### Organization usage reporting
 
-`GET /api/organizations/:organizationId/usage` returns organization-scoped event totals and per-project/API-key breakdowns. It defaults to the trailing 30 days and accepts ISO-8601 `from` and `to` parameters for custom windows up to 90 days. Ingestion entitlements are enforced per API key using the organization’s Free, Pro, or Enterprise plan. The public `GET /api/plans` endpoint publishes the plan catalog. This is not payment processing or a subscription checkout system. See [Usage metering](docs/USAGE-METERING.md) and [Subscription plans](docs/SUBSCRIPTION-PLANS.md).
+`GET /api/organizations/:organizationId/usage` returns organization-scoped event totals and per-project/API-key breakdowns. It defaults to the trailing 30 days and accepts ISO-8601 `from` and `to` parameters for custom windows up to 90 days. Ingestion entitlements are enforced per API key using the organization’s Free, Pro, or Enterprise plan. The public `GET /api/plans` endpoint publishes the plan catalog. Organization admins can inspect API-key usage and plan entitlements in the workspace UI. The API-key console supports secure creation, one-time secret copying, metadata listing, and revocation. A safe manual rotation procedure is to create a replacement key, deploy it to the integration, verify traffic, then revoke the old key. This is not payment processing or a subscription checkout system. See [API keys](docs/API-KEYS.md), [Usage metering](docs/USAGE-METERING.md), and [Subscription plans](docs/SUBSCRIPTION-PLANS.md).
 
 ## Architecture
 
@@ -282,7 +282,7 @@ CI success verifies the checks in that workflow; it does not imply that a produc
 - [x] Secure API-key lifecycle and scoped event ingestion
 - [x] Atomic per-key request and event quotas
 - [x] Organization-level usage reporting
-- [x] Plan catalog and organization-level Free/Pro/Enterprise ingestion entitlements\n- [x] Authenticated workspace dashboard, organization creation, project registry, and team management UI
+- [x] Plan catalog and organization-level Free/Pro/Enterprise ingestion entitlements\n- [x] Authenticated workspace dashboard, organization creation, project registry, and team management UI\n- [x] Organization API-key console, usage dashboard, and read-only plan/billing overview
 - [ ] Payment-backed subscription lifecycle, self-service upgrades, and billing
 - [ ] API-key rotation workflow and usage threshold notifications\n- [ ] Invitation email delivery and invitee acceptance UI
 - [ ] Product SDKs and durable event transport
