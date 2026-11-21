@@ -18,6 +18,7 @@ SignalForge is an event-driven product analytics and experimentation platform de
 - Project-scoped batch event ingestion with strict validation and duplicate protection
 - Atomic per-API-key limits: 120 requests and 10,000 submitted events per minute, with HTTP 429 retry guidance
 - PostgreSQL concurrency tests proving quota enforcement under simultaneous requests
+- Authenticated organization usage API with 30-day default reporting, bounded 90-day custom windows, and project/API-key event breakdowns
 - Committed PostgreSQL migrations and CI migration-apply verification
 
 ## Product roadmap
@@ -78,7 +79,11 @@ pnpm db:deploy     # Apply committed migrations
 pnpm db:studio     # Open Prisma Studio
 ```
 
-See [Automated tests](docs/TESTING.md), [Database migrations](docs/DATABASE.md), [Identity API](docs/IDENTITY.md), [Security baseline](docs/SECURITY.md), [API keys](docs/API-KEYS.md), and [Event ingestion](docs/EVENT-INGESTION.md).
+See [Automated tests](docs/TESTING.md), [Database migrations](docs/DATABASE.md), [Identity API](docs/IDENTITY.md), [Security baseline](docs/SECURITY.md), [API keys](docs/API-KEYS.md), and [Event ingestion](docs/EVENT-INGESTION.md), and [Usage metering](docs/USAGE-METERING.md).
+
+## Usage reporting
+
+Organization members can inspect event volume through `GET /api/organizations/:organizationId/usage`. The endpoint defaults to the trailing 30 days and accepts optional ISO-8601 `from` and `to` parameters (maximum 90 days). It returns organization-scoped totals and per-project/API-key breakdowns without exposing key hashes or secrets. See [docs/USAGE-METERING.md](docs/USAGE-METERING.md). This is usage visibility, not subscription billing or payment processing.
 
 ## Event ingestion
 
