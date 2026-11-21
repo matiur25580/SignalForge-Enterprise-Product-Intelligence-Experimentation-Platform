@@ -28,9 +28,10 @@
 
 ## Authentication abuse protection
 
-- GitHub OAuth sign-in initiation is rate-limited to 10 attempts per client address per 15-minute fixed window, both through the sign-in server action and direct Auth.js sign-in endpoints.
+- GitHub OAuth sign-in initiation is rate-limited to 10 attempts per client address per 15-minute fixed window, both through the sign-in server action and direct Auth.js sign-in endpoints. After GitHub authenticates the provider identity, a separate 10-attempt per-account window protects session creation.
 - Rate-limit counters are stored in PostgreSQL, so limits are shared across application instances rather than relying on per-process memory.
-- Client addresses are keyed with SHA-256 and the application auth secret before persistence; raw IP addresses are not stored in the limiter table.
+- Client addresses and provider account identifiers are keyed with SHA-256 and the application auth secret before persistence; raw IP addresses and provider account IDs are not stored in the limiter table.
+- Expired buckets are pruned opportunistically during limiter requests.
 - Requests over the limit receive HTTP 429 with `Retry-After` and rate-limit headers. If the limiter database is unavailable, sign-in initiation fails closed with HTTP 503 or a retry notice rather than silently bypassing protection.
 - The migration creates `AuthRateLimit`; deploy the database migration before running the updated application.
 
@@ -46,7 +47,7 @@
 ## Before production
 
 This is an initial security baseline, not a production security certification. Add:
-- OAuth callback and account-linking threat review
+- Complete OAuth account-linking threat review (safe callback URL validation and provider account throttling are implemented)
 - Rate limits and abuse controls for authentication and organization creation
 - CSRF/origin and deployment-host configuration review
 - Secret rotation and managed secret storage
