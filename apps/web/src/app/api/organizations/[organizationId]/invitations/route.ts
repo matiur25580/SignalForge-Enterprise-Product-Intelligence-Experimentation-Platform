@@ -51,7 +51,7 @@ export async function POST(request: Request, { params }: RouteContext) {
     const input = createInvitationSchema.parse(await request.json());
 
     const existingMember = await prisma.organizationMember.findFirst({
-      where: { organizationId, user: { email: input.email } },
+      where: { organizationId, user: { email: { equals: input.email, mode: "insensitive" } } },
       select: { id: true },
     });
     if (existingMember) {
