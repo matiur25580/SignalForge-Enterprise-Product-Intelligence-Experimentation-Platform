@@ -70,3 +70,8 @@ When either per-key quota is exhausted, the endpoint returns HTTP 429 with a `Re
 - The current limits are fixed code defaults; plan-based quotas and organization-level usage administration are not implemented yet.
 - Storage remains PostgreSQL-backed; Kafka/Redpanda, ClickHouse, payload retention policies, schema registry, and a first-party SDK are not wired in.
 - CI applies committed migrations to an ephemeral PostgreSQL 16 database and runs PostgreSQL-backed concurrency tests. Production database migration and runtime verification remain operator responsibilities.
+
+
+## Subscription plan quotas
+
+Quotas are resolved from the authenticated API key's organization plan, never from a client-supplied plan field. Free organizations receive 120 requests and 10,000 submitted events per minute per API key; Pro receives 600 and 50,000; Enterprise receives 3,000 and 250,000. See [Subscription plans](SUBSCRIPTION-PLANS.md).
