@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   upsertInvitation: vi.fn(),
   auditCreate: vi.fn(),
   transaction: vi.fn(),
+  sendEmail: vi.fn(),
+  updateManyInvitation: vi.fn(),
 }));
 
 vi.mock("@/lib/tenant", () => ({
@@ -27,7 +29,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 vi.mock("@/lib/invitation-email", () => ({
-  sendOrganizationInvitationEmail: vi.fn().mockResolvedValue({ delivered: false, reason: "NOT_CONFIGURED" }),
+  sendOrganizationInvitationEmail: mocks.sendEmail,
 }));
 vi.mock("@/lib/invitations", () => ({
   generateInvitationToken: () => ({ secret: "sf_inv_one_time_secret_token", tokenHash: "a".repeat(64) }),
@@ -52,6 +54,8 @@ describe("organization invitation collection", () => {
     mocks.requireMember.mockResolvedValue({ user: { id: "user_owner" }, membership: { role: "OWNER" } });
     mocks.findFirstMember.mockResolvedValue(null);
     mocks.findOrganization.mockResolvedValue({ name: "SignalForge Test" });
+    mocks.sendEmail.mockResolvedValue({ delivered: false, reason: "NOT_CONFIGURED" });
+    mocks.updateManyInvitation.mockResolvedValue({ count: 1 });
     mocks.findManyInvitations.mockResolvedValue([]);
     mocks.findUniqueInvitation.mockResolvedValue(null);
     mocks.upsertInvitation.mockResolvedValue({
@@ -63,6 +67,7 @@ describe("organization invitation collection", () => {
       organizationInvitation: {
         findUnique: mocks.findUniqueInvitation,
         upsert: mocks.upsertInvitation,
+        updateMany: mocks.updateManyInvitation,
       },
       auditLog: { create: mocks.auditCreate },
     };
