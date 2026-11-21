@@ -42,4 +42,4 @@ Last updated: 2026-11-21
 
 ## Verification
 
-The latest GitHub Actions CI run before the event-ingestion changes passed dependency installation, Prisma Client generation, Prisma schema validation, lint, typecheck, and production build. The event-ingestion changes have not yet been covered by a CI run at the time of this update. No live PostgreSQL migration or runtime integration test has been executed. Generate and review the migration, then run database-backed tests before production use.
+GitHub Actions run [44875239317](https://github.com/matiur25580/SignalForge-Enterprise-Product-Intelligence-Experimentation-Platform/actions/runs/44875239317), on the event endpoint and Prisma Event model commit, passed dependency installation, Prisma Client generation, Prisma schema validation, lint, typecheck, and production build. A later documentation/status-only commit has its own CI run in progress. No live PostgreSQL migration or runtime integration test has been executed. Generate and review the migration, then run database-backed tests before production use.
