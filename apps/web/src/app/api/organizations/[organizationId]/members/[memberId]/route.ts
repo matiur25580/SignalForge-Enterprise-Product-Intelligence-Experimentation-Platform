@@ -72,7 +72,7 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   }
 }
 
-export async function DELETE(_request: Request, { params }: RouteContext) {
+export async function DELETE(request: Request, { params }: RouteContext) {
   try {
     const { organizationId, memberId } = await params;
     const { user, membership: actor } = await requireOrganizationMember(organizationId, ["OWNER", "ADMIN"]);
