@@ -207,3 +207,12 @@ model IngestionRateLimit {
   updatedAt    DateTime @updatedAt
   apiKey       ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
 }
+
+model AuthRateLimit {
+  key             String   @id
+  windowStartedAt DateTime
+  requestCount    Int      @default(0)
+  expiresAt       DateTime
+
+  @@index([expiresAt])
+}
