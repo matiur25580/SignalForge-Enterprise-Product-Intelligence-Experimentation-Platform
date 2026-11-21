@@ -13,7 +13,7 @@
 ![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?logo=prisma)
 ![License](https://img.shields.io/badge/License-Not%20yet%20selected-lightgrey)
 
-[Architecture](#architecture) · [Capabilities](#implemented-capabilities) · [Dashboard concepts](#dashboard-concepts) · [Activity timeline](docs/ACTIVITY-TIMELINE.md) · [Getting started](#getting-started) · [Roadmap](#roadmap)
+[Architecture](#architecture) · [Capabilities](#implemented-capabilities) · [Dashboard concepts](#dashboard-concepts) · [Activity timeline](docs/ACTIVITY-TIMELINE.md) · [Security](docs/SECURITY.md) · [Getting started](#getting-started) · [Roadmap](#roadmap)
 
 </div>
 
@@ -31,7 +31,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 
 | Area | Current implementation |
 |---|---|
-| Identity | Auth.js GitHub OAuth and database-backed sessions |
+| Identity | Auth.js GitHub OAuth, database-backed sessions, active-session inventory, and remote session revocation |
 | Multi-tenancy | Organizations, memberships, roles, and server-side access checks |
 | Team management | Secure owner-controlled ownership transfer with typed confirmation and atomic role handoff; secure email-bound invitations with optional Resend delivery, member directory, role administration, guarded removal, single-use acceptance, revocation, audit trail, and interactive team UI |
 | Workspace UI | Authenticated organization dashboard, workspace creation, project registry, team administration, and invitation token handling |
@@ -42,6 +42,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 | Usage intelligence | Authenticated organization usage report with project and API-key breakdowns, dashboard summaries, and plan entitlement visibility |
 | Plan entitlements | Free, Pro, and Enterprise organization tiers with plan-specific atomic per-key ingestion quotas and a transparent plan comparison page |
 | Billing visibility | Current plan, tier comparison, usage and entitlement overview; payment processing is explicitly disabled |
+| Account security | Private active-session inventory, current-session protection, one-way session identifiers, and per-session remote revocation |
 | Auditability | Transactional audit records and a tenant-scoped organization activity timeline with cursor-paginated API |
 | Database delivery | Committed Prisma migrations applied against clean PostgreSQL in CI |
 | Quality gates | Vitest, ESLint, TypeScript checks, Prisma validation, and production build in GitHub Actions |
