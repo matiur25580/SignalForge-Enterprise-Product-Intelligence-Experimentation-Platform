@@ -55,6 +55,9 @@ jobs:
       - name: Apply committed migrations
         run: pnpm db:deploy
 
+      - name: Automated tests
+        run: pnpm test
+
       - name: Lint
         run: pnpm lint
 
