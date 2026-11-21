@@ -26,6 +26,7 @@ Last updated: 2026-11-21
 - [x] OWNER-only ownership transfer with typed confirmation, concurrency guards, atomic role changes, and audit trail
 - [x] Transactional audit records for invitation and membership lifecycle actions
 - [x] Organization activity timeline page and tenant-scoped cursor-paginated audit API
+- [x] OWNER/ADMIN security alert center with audit-based detection, severity, deduplication, resolve/reopen lifecycle, and tenant-scoped API
 - [x] Invitation and member-management API tests
 - [x] Active-session API tests and session revocation safeguards
 - [x] OAuth sign-in abuse protection: 10 attempts per client address and authenticated provider account per 15-minute window, shared PostgreSQL counters, privacy-preserving hashed subject keys, and expired-bucket cleanup
@@ -54,7 +55,7 @@ Last updated: 2026-11-21
 
 ### Quality and documentation
 - [x] Vitest unit, route, and PostgreSQL integration test suites
-- [x] PostgreSQL migrations for core schema, ingestion quotas, subscription plans, organization invitations, and authentication rate limits
+- [x] PostgreSQL migrations for core schema, ingestion quotas, subscription plans, organization invitations, authentication rate limits, and security alerts
 - [x] GitHub Actions CI for clean PostgreSQL migration, tests, lint, typecheck, and production build
 - [x] Architecture, security, API, database, usage, team-management, and testing documentation
 - [x] Twelve original conceptual dashboard previews embedded as PNG for GitHub mobile compatibility, with source SVGs retained
@@ -85,7 +86,7 @@ The CI workflow verifies clean PostgreSQL migrations, automated tests, lint, Typ
 - dependency installation (with a pinned Rollup release to avoid an unavailable optional native-package artifact)
 - Prisma Client generation and schema validation
 - all four committed PostgreSQL migrations against a clean ephemeral PostgreSQL 16 database
-- 39 automated tests across 10 test files in the last previously recorded passing run; additional rotation and PostgreSQL ingestion route integration tests were added afterward and require fresh CI verification
+- Security alert detection and route tests are committed; the new CI run must confirm the expanded suite, schema migration, lint, typecheck, and production build.
 - ESLint
 - TypeScript typecheck
 - Next.js production build
