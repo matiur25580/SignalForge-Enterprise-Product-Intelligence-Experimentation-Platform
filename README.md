@@ -33,7 +33,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 |---|---|
 | Identity | Auth.js GitHub OAuth and database-backed sessions |
 | Multi-tenancy | Organizations, memberships, roles, and server-side access checks |
-| Team management | Secure email-bound invitations, role assignment, single-use acceptance, revocation, and audit trail |
+| Team management | Secure email-bound invitations, member directory, role administration, guarded removal, single-use acceptance, revocation, and audit trail |
 | Projects | Organization-scoped project creation and listing |
 | API credentials | Cryptographically random secrets, SHA-256 hash-only storage, one-time display, expiry, and revocation |
 | Event ingestion | Strictly validated batch endpoint, bounded payloads, server-derived environment, and duplicate protection |
@@ -46,7 +46,7 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 
 ### Team invitations
 
-Organization OWNERs and ADMINs can invite teammates as ADMIN, MEMBER, or VIEWER. Invitation tokens are generated using cryptographically secure randomness, stored only as SHA-256 hashes, expire after seven days, and can be accepted only by a signed-in account with the matching email. Acceptance and revocation are transactional and audited. The API returns the invitation token once; automatic email delivery and the invitation UI are not implemented yet. See [Team management](docs/TEAM-MANAGEMENT.md).
+Organization OWNERs and ADMINs can invite teammates as ADMIN, MEMBER, or VIEWER. Invitation tokens are generated using cryptographically secure randomness, stored only as SHA-256 hashes, expire after seven days, and can be accepted only by a signed-in account with the matching email. Members can be listed, roles can be changed under a strict OWNER/ADMIN hierarchy, and non-owner members can be removed. Acceptance, role changes, revocation, and removal are transactional and audited. The API returns the invitation token once; automatic email delivery and the invitation UI are not implemented yet. See [Team management](docs/TEAM-MANAGEMENT.md).
 
 ### Event ingestion contract
 
