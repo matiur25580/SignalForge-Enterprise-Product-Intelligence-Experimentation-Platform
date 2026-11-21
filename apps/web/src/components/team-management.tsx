@@ -48,8 +48,8 @@ export function TeamManagement({ organizationId, currentRole }: Props) {
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error ?? "Could not create invitation");
-      setToken(body.invitation.acceptanceToken);
-      setNotice("Invitation created. Copy the one-time token and deliver it securely to the invitee.");
+      setToken(body.invitation.acceptanceUrl ?? body.invitation.acceptanceToken ?? "");
+      setNotice(body.invitation.delivery === "EMAIL_SENT" ? "Invitation email sent successfully." : "Invitation created. Email is not configured; copy the one-time link and share it securely.");
       setEmail(""); await load();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not create invitation");
@@ -92,7 +92,7 @@ export function TeamManagement({ organizationId, currentRole }: Props) {
     <div className="space-y-8">
       {error ? <p role="alert" className="rounded-xl border border-rose-400/30 bg-rose-400/10 p-4 text-sm text-rose-200">{error}</p> : null}
       {notice ? <p role="status" className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-sm text-emerald-200">{notice}</p> : null}
-      {token ? <section className="panel p-5"><p className="eyebrow">One-time invitation link</p><p className="mt-2 text-sm muted">Email delivery is not configured. Copy this link now and share it through a secure channel.</p><div className="mt-3 flex flex-wrap gap-2"><code className="min-w-0 flex-1 break-all rounded-lg bg-black/30 p-3 text-sm">{token}</code><button className="action-primary" onClick={copyToken}>Copy token</button></div></section> : null}
+      {token ? <section className="panel p-5"><p className="eyebrow">One-time invitation link</p><p className="mt-2 text-sm muted">Email delivery is not configured. Copy this link now and share it through a secure channel.</p><div className="mt-3 flex flex-wrap gap-2"><code className="min-w-0 flex-1 break-all rounded-lg bg-black/30 p-3 text-sm">{token}</code><button className="action-primary" onClick={copyToken}>Copy invitation link</button></div></section> : null}
 
       {canManage ? <section className="panel p-6"><p className="eyebrow">Invite a teammate</p><h2 className="mt-2 text-xl font-bold">Grow your workspace</h2><form onSubmit={invite} className="mt-5 grid gap-3 md:grid-cols-[1fr_180px_auto] md:items-end"><label className="text-sm font-semibold">Email address<input className="field mt-2" type="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} placeholder="teammate@company.com" /></label><label className="text-sm font-semibold">Organization role<select className="field mt-2" value={role} onChange={(event) => setRole(event.target.value)}><option value="MEMBER">Member</option><option value="VIEWER">Viewer</option>{currentRole === "OWNER" ? <option value="ADMIN">Admin</option> : null}</select></label><button className="action-primary" disabled={busy}>{busy ? "Working…" : "Create invitation"}</button></form><p className="mt-3 text-xs muted">Invitations expire after seven days. When configured, SignalForge emails a single-use acceptance link. The invitee must sign in using the matching account email.</p></section> : null}
 
