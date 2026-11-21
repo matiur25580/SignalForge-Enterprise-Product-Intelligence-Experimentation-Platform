@@ -38,11 +38,11 @@ The project emphasizes the engineering foundations behind a credible SaaS produc
 | Projects | Organization-scoped project creation and listing |
 | API credentials | Cryptographically random secrets, SHA-256 hash-only storage, one-time display, expiry, revocation, atomic audited rotation, and interactive organization key console |
 | Event ingestion | Strictly validated batch endpoint, bounded payloads, server-derived environment, and duplicate protection |
-| Rate limiting | Atomic PostgreSQL per-key limits: 120 requests and 10,000 submitted events per minute |
+| Rate limiting | Atomic PostgreSQL per-key ingestion quotas plus shared 10-attempt / 15-minute OAuth sign-in protection with privacy-preserving client-address hashes |
 | Usage intelligence | Authenticated organization usage report with project and API-key breakdowns, dashboard summaries, and plan entitlement visibility |
 | Plan entitlements | Free, Pro, and Enterprise organization tiers with plan-specific atomic per-key ingestion quotas and a transparent plan comparison page |
 | Billing visibility | Current plan, tier comparison, usage and entitlement overview; payment processing is explicitly disabled |
-| Account security | Private active-session inventory, current-session protection, one-way session identifiers, and per-session remote revocation |
+| Account security | Private active-session inventory, current-session protection, one-way session identifiers, per-session remote revocation, and OAuth sign-in abuse protection |
 | Auditability | Transactional audit records and a tenant-scoped organization activity timeline with cursor-paginated API |
 | Database delivery | Committed Prisma migrations applied against clean PostgreSQL in CI |
 | Quality gates | Vitest, ESLint, TypeScript checks, Prisma validation, and production build in GitHub Actions |
@@ -79,7 +79,7 @@ Content-Type: application/json
 }
 ```
 
-The endpoint validates the payload, verifies API-key scope and lifecycle state, enforces per-key request/event quotas in PostgreSQL, persists events with project-scoped idempotency, and reports accepted/duplicate counts. See [Event ingestion](docs/EVENT-INGESTION.md).
+The endpoint validates the payload, verifies API-key scope and lifecycle state, enforces per-key request/event quotas in PostgreSQL, persists events with project-scoped idempotency, and reports accepted/duplicate counts. OAuth sign-in initiation is separately rate-limited across app instances using a PostgreSQL fixed-window counter; only a keyed SHA-256 digest of the client address is stored. See [Event ingestion](docs/EVENT-INGESTION.md) and [Security](docs/SECURITY.md).
 
 ### Organization usage reporting
 
