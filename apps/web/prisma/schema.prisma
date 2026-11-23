@@ -243,6 +243,8 @@ model SecurityAlert {
   lastSeenAt      DateTime
   resolvedAt      DateTime?
   lastNotifiedAt  DateTime?
+  notificationClaimedAt DateTime?
+  notificationClaimToken String? @unique
   organization    Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
@@ -250,4 +252,5 @@ model SecurityAlert {
   @@unique([organizationId, fingerprint])
   @@index([organizationId, status, severity, lastSeenAt])
   @@index([status, lastNotifiedAt])
+  @@index([notificationClaimedAt])
 }
