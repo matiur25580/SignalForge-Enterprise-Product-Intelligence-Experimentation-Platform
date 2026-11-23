@@ -15,7 +15,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 vi.mock("@/lib/security-alerts", () => ({ evaluateSecurityAlerts: mocks.evaluate }));
-import { runSecurityMonitor } from "@/lib/security-monitor";
+import { isAuthorizedSecurityMonitor, runSecurityMonitor } from "@/lib/security-monitor";
 
 const now = new Date("2026-11-21T12:00:00.000Z");
 const alert = {
@@ -85,5 +85,34 @@ describe("security monitor notification claims", () => {
     });
     expect(mocks.claim).toHaveBeenCalledTimes(2);
     expect(globalThis.fetch).not.toHaveBeenCalled();
+  });
+});
+
+
+describe("security monitor bearer authorization", () => {
+  const secret = "a".repeat(40);
+
+  beforeEach(() => {
+    vi.stubEnv("SECURITY_MONITOR_SECRET", secret);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("accepts a valid Bearer token with the standard scheme separator", () => {
+    const request = new Request("https://example.test/api/security-monitor", {
+      headers: { authorization: `Bearer ${secret}` },
+    });
+    expect(isAuthorizedSecurityMonitor(request)).toBe(true);
+  });
+
+  it("rejects a wrong token and a missing authorization header", () => {
+    const wrongToken = new Request("https://example.test/api/security-monitor", {
+      headers: { authorization: `Bearer ${"b".repeat(40)}` },
+    });
+    const missing = new Request("https://example.test/api/security-monitor");
+    expect(isAuthorizedSecurityMonitor(wrongToken)).toBe(false);
+    expect(isAuthorizedSecurityMonitor(missing)).toBe(false);
   });
 });
