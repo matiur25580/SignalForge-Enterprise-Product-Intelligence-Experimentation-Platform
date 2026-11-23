@@ -15,7 +15,7 @@ function secretMatches(expected: string, supplied: string | null) {
 export function isAuthorizedSecurityMonitor(request: Request) {
   const secret = process.env.SECURITY_MONITOR_SECRET;
   if (!secret || secret.length < 32) return false;
-  return secretMatches(secret, request.headers.get("authorization")?.replace(/^Bearer\\s+/i, "") ?? null);
+  return secretMatches(secret, request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? null);
 }
 
 async function sendNotifications(input: {
@@ -24,7 +24,7 @@ async function sendNotifications(input: {
   recipients: string[];
 }) {
   const lines = input.alerts.map((alert) => `[${alert.severity}] ${alert.summary} (${alert.occurrenceCount} events)`);
-  const message = [`SignalForge security alerts for ${input.organizationName}`, "", ...lines].join("\\n");
+  const message = [`SignalForge security alerts for ${input.organizationName}`, "", ...lines].join("\n");
   const tasks: Promise<void>[] = [];
 
   if (process.env.RESEND_API_KEY && process.env.EMAIL_FROM && input.recipients.length) {
