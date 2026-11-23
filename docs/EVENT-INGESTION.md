@@ -35,7 +35,8 @@ Request body:
 
 ## Validation and limits
 
-- Request bodies are limited to 256 KiB.
+- Request bodies are limited to 256 KiB. The handler rejects an oversized declared `Content-Length` early and independently counts streamed bytes, canceling the body as soon as the actual byte limit is crossed; it does not buffer an unbounded body before enforcing the cap.
+- Request bodies must be valid UTF-8 JSON.
 - Each API key is limited to 120 requests and 10,000 submitted events per fixed 60-second window. Limits are independent per key and enforced atomically in PostgreSQL.
 - Batches contain 1–100 events.
 - Event IDs and names are 1–128 characters and restricted to letters, digits, dot, underscore, colon, and hyphen.
@@ -66,9 +67,8 @@ When either per-key quota is exhausted, the endpoint returns HTTP 429 with a `Re
 
 ## Current limitations
 
-- Storage is PostgreSQL-backed; Kafka/Redpanda and ClickHouse are not wired in.
-- The current limits are fixed code defaults; plan-based quotas and organization-level usage administration are not implemented yet.
-- Storage remains PostgreSQL-backed; Kafka/Redpanda, ClickHouse, payload retention policies, schema registry, and a first-party SDK are not wired in.
+- PostgreSQL is the synchronous operational store; Kafka/Redpanda and ClickHouse are not wired in.
+- Payload retention policies, a schema registry, and first-party SDKs are not implemented yet.
 - CI applies committed migrations to an ephemeral PostgreSQL 16 database and runs PostgreSQL-backed concurrency tests. Production database migration and runtime verification remain operator responsibilities.
 
 
