@@ -31,6 +31,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
   }
 }
 
+// Restrict key creation to organization owners/admins and record the creation in the audit log.
 export async function POST(request: Request, { params }: RouteContext) {
   try {
     const { organizationId } = await params;
