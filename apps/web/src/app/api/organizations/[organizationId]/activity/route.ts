@@ -5,6 +5,7 @@ import { apiError, requireOrganizationMember } from "@/lib/tenant";
 type RouteContext = { params: Promise<{ organizationId: string }> };
 const querySchema = z.object({ limit: z.coerce.number().int().min(1).max(100).default(50), cursor: z.string().cuid().optional() });
 
+// Return organization-scoped audit history using bounded cursor pagination.
 export async function GET(request: Request, { params }: RouteContext) {
   try {
     const { organizationId } = await params;
