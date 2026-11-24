@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { apiError, requireUser } from "@/lib/tenant";
 
+// Expose a one-way identifier for a session instead of returning its bearer credential.
 function sessionId(sessionToken: string) {
   return createHash("sha256").update(sessionToken).digest("hex");
 }
