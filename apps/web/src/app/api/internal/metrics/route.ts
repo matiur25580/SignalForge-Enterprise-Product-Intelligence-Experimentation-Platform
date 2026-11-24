@@ -5,6 +5,7 @@ import { renderHttpMetrics } from "@/lib/observability-runtime";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// Compare equal-length credential buffers in constant time to protect the internal metrics endpoint.
 function authorized(request: Request) {
   const expected = process.env.OBSERVABILITY_TOKEN;
   const supplied = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
